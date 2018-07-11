@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "444140517028",
+    "firebase_url": "https://forestappv4.firebaseio.com",
+    "project_id": "forestappv4",
+    "storage_bucket": "forestappv4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:444140517028:android:bb5e0a5654635394",
+        "android_client_info": {
+          "package_name": "com.coding.jjlop.forestappv4"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "444140517028-gdol0dosvfosuf1kag5b338upqdu3dmj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.coding.jjlop.forestappv4",
+            "certificate_hash": "597fe66dddf54fca3f464f8044ca0c1e0f35f76f"
+          }
+        },
+        {
+          "client_id": "444140517028-bbbtbgnsulqc51fggf24mc4u5iiihbal.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDcbh0i2kbqBuMX4dEFthGRTDQZ6Qiwb-k"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "444140517028-bbbtbgnsulqc51fggf24mc4u5iiihbal.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
