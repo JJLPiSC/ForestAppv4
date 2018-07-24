@@ -27,11 +27,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             R.drawable.exchange,
             R.drawable.adopt
     };
+    String uid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+       uid = getIntent().getStringExtra("Uid");
 
         gvm=findViewById(R.id.gv_Menu);
         GridAdapter ga= new GridAdapter(this,values,images);
@@ -72,16 +74,20 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         if (i==0){
             Intent it = new Intent(MainActivity.this, Own.class);
+            it.putExtra("Uid",uid);
             startActivity(it);
         }if (i==1){
             Intent it = new Intent(MainActivity.this,Plant.class);
+            it.putExtra("Uid",uid);
             startActivity(it);
         }if (i==2){
             Intent it = new Intent(MainActivity.this,Exchange.class);
+            it.putExtra("Uid",uid);
             startActivity(it);
         }
         if (i==3){
             Intent it = new Intent(MainActivity.this,Adopt.class);
+            it.putExtra("Uid",uid);
             startActivity(it);
         }
 

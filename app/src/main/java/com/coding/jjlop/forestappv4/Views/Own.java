@@ -6,6 +6,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.coding.jjlop.forestappv4.R;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -22,15 +23,17 @@ public class Own extends AppCompatActivity {
     private DatabaseReference mDataBase;
     private ArrayList<String> tree_List = new ArrayList<>();
     private ArrayList<String> keys_List= new ArrayList();
+    private String uid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_own);
+        uid = getIntent().getStringExtra("Uid");
         mDataBase= FirebaseDatabase.getInstance().getReference().child("Trees");
         ListV= findViewById(R.id.T_List);
 
-        final ArrayAdapter<String> arrayAdapter=new ArrayAdapter<String>(this,android.R.layout.simple_expandable_list_item_1,tree_List);
+        final ArrayAdapter<String> arrayAdapter=new ArrayAdapter<>(this,android.R.layout.simple_expandable_list_item_1,tree_List);
         ListV.setAdapter(arrayAdapter);
 
         mDataBase.addChildEventListener(new ChildEventListener() {

@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.provider.ContactsContract;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -20,9 +21,12 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.coding.jjlop.forestappv4.Model.Planted;
+import com.coding.jjlop.forestappv4.Model.Tree;
 import com.coding.jjlop.forestappv4.R;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -37,42 +41,60 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
+import org.json.JSONObject;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Queue;
 
 public class Plant extends FragmentActivity implements OnMapReadyCallback, View.OnClickListener {
 
     LocationManager locationManager;
     double longitudeNetwork, latitudeNetwork;
     TextView longitudeValueNetwork, latitudeValueNetwork;
-    Button btn1,btn2;
+    Button btn1,btn2,btn3;
     GoogleMap mMap;
-    int index =1;
-    private DatabaseReference mDatabase;
-    private DatabaseReference mDbT;
+    Spinner tSpinner;
+    private DatabaseReference mDatabase, t_LRef;
     private ArrayList<String> tree_List = new ArrayList<>();
     private ArrayList<String> keys_List= new ArrayList();
-    String l;
+    final List<String> trees = new ArrayList<>();
+    final List<String> itrees = new ArrayList<>();
+    String l,t;
+    String uid;
+    Tree tree;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_plant);
         mDatabase = FirebaseDatabase.getInstance().getReference();
-        mDbT = FirebaseDatabase.getInstance().getReference().child("Users/Test/Trees");
+        t_LRef = FirebaseDatabase.getInstance().getReference();
+        uid = getIntent().getStringExtra("Uid");
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        btn1= (Button) findViewById(R.id.btn_Add);
-        btn2= (Button) findViewById(R.id.btn_Save);
+        btn1= findViewById(R.id.btn_Add);
+        btn2= findViewById(R.id.btn_Save);
+        btn3= findViewById(R.id.btn_t);
         btn1.setOnClickListener(this);
         btn2.setOnClickListener(this);
-        longitudeValueNetwork = (TextView) findViewById(R.id.longitudeValueNetwork);
-        latitudeValueNetwork = (TextView) findViewById(R.id.latitudeValueNetwork);
+        btn3.setOnClickListener(this);
+        tSpinner = findViewById(R.id.snp_tr);
+        longitudeValueNetwork = findViewById(R.id.longitudeValueNetwork);
+        latitudeValueNetwork = findViewById(R.id.latitudeValueNetwork);
         int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getApplicationContext());
         if (status == ConnectionResult.SUCCESS) {
             SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -83,11 +105,11 @@ public class Plant extends FragmentActivity implements OnMapReadyCallback, View.
             d.show();
         }
         //////
-        String Key=mDbT.getKey();
-        Log.d(l,""+Key);
+        //String Key=mDatabase.child("Users/"+uid+"/Trees").getKey();
+        //Log.d(l,"Key1"+Key);
+        fillSnp();
 
     }
-
 
     private boolean checkLocation() {
         if (!isLocationEnabled())
@@ -167,7 +189,6 @@ public class Plant extends FragmentActivity implements OnMapReadyCallback, View.
         }
     };
 
-
     public void AddMarker(){
         LatLng t1 = new LatLng(Double.parseDouble((String) latitudeValueNetwork.getText()), Double.parseDouble((String) longitudeValueNetwork.getText()));
         mMap.addMarker(new MarkerOptions().position(t1).title("My Tree!!!").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
@@ -175,24 +196,90 @@ public class Plant extends FragmentActivity implements OnMapReadyCallback, View.
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(t1, zoom));
 
     }
-    public void SaveCoord(){
+
+    public void Save(){
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+        Date date = new Date();
+        String fecha = dateFormat.format(date);
         String Lat=latitudeValueNetwork.getText().toString().trim();
         String Lng=longitudeValueNetwork.getText().toString().trim();
-        HashMap<String,String> dataMap = new HashMap<>();
+        //mDatabase.child("T_Ctlg");
+        //Query q= mDatabase.child("T_Ctlg").orderByChild("name").equalTo((String) tSpinner.getSelectedItem());
+        Query q= mDatabase.child("T_Ctlg");
+                Log.d("Type",""+tSpinner.getSelectedItem());
+
+        //Query q = mDatabase.child("T_Ctlg");
+        q.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                   // tree = dataSnapshot.getValue(Tree.class);
+                   //t = String.valueOf(dataSnapshot.getValue());
+               // t=tree.getName();
+                for (DataSnapshot areaSnapshot: dataSnapshot.getChildren()) {
+                    String tName = areaSnapshot.child("name").getValue(String.class);
+                    String tId = areaSnapshot.child("id_t").getValue(String.class);
+                    if (tName == tSpinner.getSelectedItem()){
+                        String k = areaSnapshot.getKey();
+                        Log.d("PKey: ",k);
+                        t=tName;
+                    }
+                }
+
+
+                 //Log.d("FY: "t);
+                //Log.d("Type tree",""+tree.toString());
+               // Log.d("Type",""+tree.getName());
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        Planted p = new Planted(uid,Lat,Lng,fecha,t);
+       /* Map dataMap= new HashMap();
+        dataMap.put("Id_P",uid);
         dataMap.put("Lat",Lat);
-        dataMap.put("Lng",Lng);
-        mDatabase.child("Users/Test/Trees/"+index).setValue(dataMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+        dataMap.put("Lng",Lng);*/
+        mDatabase.child("Planted").push().setValue(p).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()){
                     Toast.makeText(Plant.this,"Stored...", Toast.LENGTH_SHORT).show();
                 }else{
-                    Toast.makeText(Plant.this,"Error..!!!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(Plant.this,"Error..!!!"+task.getException(), Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
     }
+     public void fillSnp(){
+        Query q = t_LRef.child("T_Ctlg");
+         q.addValueEventListener(new ValueEventListener() {
+             @Override
+             public void onDataChange(DataSnapshot dataSnapshot) {
+                 // Is better to use a List, because you don't know the size
+                 // of the iterator returned by dataSnapshot.getChildren() to
+                 // initialize the array
+                 for (DataSnapshot areaSnapshot: dataSnapshot.getChildren()) {
+                     String tName = areaSnapshot.child("name").getValue(String.class);
+                     if (!trees.contains(tName)){
+                         trees.add(tName);
+                     }
+                 }
+
+                 ArrayAdapter<String> tAdapter = new ArrayAdapter<>(Plant.this, android.R.layout.simple_spinner_item, trees);
+                 tAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                 tSpinner.setAdapter(tAdapter);
+             }
+
+             @Override
+             public void onCancelled(DatabaseError databaseError) {
+
+             }
+         });
+     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -210,8 +297,41 @@ public class Plant extends FragmentActivity implements OnMapReadyCallback, View.
                 AddMarker();
                 break;
             case R.id.btn_Save:
-                SaveCoord();
+                Save();
                 break;
+            case R.id.btn_t:
+                addT();
+                break;
+        }
+    }
+
+    private void addT() {
+        String d="",n="",v="";
+        for (int i=0;i<3;i++){
+            if (i==0){
+                d="1";
+                n="Pino";
+                v="1";
+            }else if (i==1){
+                d="2";
+                n="Durazno";
+                v="2";
+            }else if (i==2){
+                d="3";
+                n="Ciruelo";
+                v="3";
+            }
+           Tree t1 = new Tree(d,n,"O","S",v);
+            mDatabase.child("T_Ctlg").push().setValue(t1).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (task.isSuccessful()){
+                        Toast.makeText(Plant.this,"Stored...", Toast.LENGTH_SHORT).show();
+                    }else{
+                        Toast.makeText(Plant.this,"Error..!!!", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
         }
     }
 }

@@ -7,12 +7,11 @@
 
 
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:map="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="250dp"
+        android:layout_height="200dp"
         tools:context="com.coding.jjlop.forestappv4.Views.Plant"
         />
 
@@ -43,6 +42,12 @@
         android:textAlignment="center"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
+    <Spinner
+        android:id="@+id/snp_tr"
+        android:textAlignment="center"
+        android:popupTheme="@color/colorPrimaryDark"
+        android:layout_width="match_parent"
+        android:layout_height="35dp"/>
     <Button
         android:id="@+id/btn_Add"
         android:text="ADD"
@@ -51,6 +56,11 @@
     <Button
         android:id="@+id/btn_Save"
         android:text="Save"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+    <Button
+        android:id="@+id/btn_t"
+        android:text="AT"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
