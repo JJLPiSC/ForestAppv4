@@ -66,15 +66,16 @@ public class Plant extends FragmentActivity implements OnMapReadyCallback, View.
     LocationManager locationManager;
     double longitudeNetwork, latitudeNetwork;
     TextView longitudeValueNetwork, latitudeValueNetwork;
-    Button btn1,btn2,btn3;
+    Button btn1, btn2, btn3;
     GoogleMap mMap;
+    Marker marker;
     Spinner tSpinner;
-    private DatabaseReference mDatabase, t_LRef;
+    private DatabaseReference mDatabase, t_LRef, p_LRef;
     private ArrayList<String> tree_List = new ArrayList<>();
-    private ArrayList<String> keys_List= new ArrayList();
+    private ArrayList<String> keys_List = new ArrayList();
     final List<String> trees = new ArrayList<>();
     final List<String> itrees = new ArrayList<>();
-    String l,t;
+    String l, t, k;
     String uid;
     Tree tree;
 
@@ -84,11 +85,12 @@ public class Plant extends FragmentActivity implements OnMapReadyCallback, View.
         setContentView(R.layout.activity_plant);
         mDatabase = FirebaseDatabase.getInstance().getReference();
         t_LRef = FirebaseDatabase.getInstance().getReference();
+        p_LRef = FirebaseDatabase.getInstance().getReference();
         uid = getIntent().getStringExtra("Uid");
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        btn1= findViewById(R.id.btn_Add);
-        btn2= findViewById(R.id.btn_Save);
-        btn3= findViewById(R.id.btn_t);
+        btn1 = findViewById(R.id.btn_Add);
+        btn2 = findViewById(R.id.btn_Save);
+        btn3 = findViewById(R.id.btn_t);
         btn1.setOnClickListener(this);
         btn2.setOnClickListener(this);
         btn3.setOnClickListener(this);
@@ -108,6 +110,7 @@ public class Plant extends FragmentActivity implements OnMapReadyCallback, View.
         //String Key=mDatabase.child("Users/"+uid+"/Trees").getKey();
         //Log.d(l,"Key1"+Key);
         fillSnp();
+        fillMap();
 
     }
 
@@ -151,8 +154,7 @@ public class Plant extends FragmentActivity implements OnMapReadyCallback, View.
             }
             locationManager.removeUpdates(locationListenerNetwork);
             button.setText(R.string.resume);
-        }
-        else {
+        } else {
             locationManager.requestLocationUpdates(
                     LocationManager.NETWORK_PROVIDER, 20 * 1000, 10, locationListenerNetwork);
             Toast.makeText(this, "Network provider started running", Toast.LENGTH_LONG).show();
@@ -183,61 +185,61 @@ public class Plant extends FragmentActivity implements OnMapReadyCallback, View.
         public void onProviderEnabled(String s) {
 
         }
+
         @Override
         public void onProviderDisabled(String s) {
 
         }
     };
 
-    public void AddMarker(){
+    public void AddMarker() {
         LatLng t1 = new LatLng(Double.parseDouble((String) latitudeValueNetwork.getText()), Double.parseDouble((String) longitudeValueNetwork.getText()));
         mMap.addMarker(new MarkerOptions().position(t1).title("My Tree!!!").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
         float zoom = 16;
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(t1, zoom));
-
     }
 
-    public void Save(){
+
+    public void Save() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
         Date date = new Date();
         String fecha = dateFormat.format(date);
-        String Lat=latitudeValueNetwork.getText().toString().trim();
-        String Lng=longitudeValueNetwork.getText().toString().trim();
+        String Lat = latitudeValueNetwork.getText().toString().trim();
+        String Lng = longitudeValueNetwork.getText().toString().trim();
         //mDatabase.child("T_Ctlg");
         //Query q= mDatabase.child("T_Ctlg").orderByChild("name").equalTo((String) tSpinner.getSelectedItem());
-        Query q= mDatabase.child("T_Ctlg");
-                Log.d("Type",""+tSpinner.getSelectedItem());
+        Query q = mDatabase.child("T_Ctlg");
+        Log.d("Type", "" + tSpinner.getSelectedItem());
 
         //Query q = mDatabase.child("T_Ctlg");
         q.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                   // tree = dataSnapshot.getValue(Tree.class);
-                   //t = String.valueOf(dataSnapshot.getValue());
-               // t=tree.getName();
-                for (DataSnapshot areaSnapshot: dataSnapshot.getChildren()) {
+                // tree = dataSnapshot.getValue(Tree.class);
+                //t = String.valueOf(dataSnapshot.getValue());
+                // t=tree.getName();
+                for (DataSnapshot areaSnapshot : dataSnapshot.getChildren()) {
                     String tName = areaSnapshot.child("name").getValue(String.class);
-                    String tId = areaSnapshot.child("id_t").getValue(String.class);
-                    if (tName == tSpinner.getSelectedItem()){
-                        String k = areaSnapshot.getKey();
-                        Log.d("PKey: ",k);
-                        t=tName;
+                    //String tId = areaSnapshot.child("id_t").getValue(String.class);
+                    if (tName == tSpinner.getSelectedItem()) {
+                        k = areaSnapshot.getKey();
+                        Log.d("PKey: ", k);
+                        t = areaSnapshot.child("name").getValue(String.class);
                     }
                 }
-
-
-                 //Log.d("FY: "t);
+                //Log.d("FY: "t);
                 //Log.d("Type tree",""+tree.toString());
-               // Log.d("Type",""+tree.getName());
+                // Log.d("Type",""+tree.getName());
             }
+
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
             }
         });
 
-        Planted p = new Planted(uid,Lat,Lng,fecha,t);
+        Planted p = new Planted(uid, Lat, Lng, fecha, t);
        /* Map dataMap= new HashMap();
         dataMap.put("Id_P",uid);
         dataMap.put("Lat",Lat);
@@ -245,41 +247,154 @@ public class Plant extends FragmentActivity implements OnMapReadyCallback, View.
         mDatabase.child("Planted").push().setValue(p).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
-                if (task.isSuccessful()){
-                    Toast.makeText(Plant.this,"Stored...", Toast.LENGTH_SHORT).show();
-                }else{
-                    Toast.makeText(Plant.this,"Error..!!!"+task.getException(), Toast.LENGTH_SHORT).show();
+                if (task.isSuccessful()) {
+                    Toast.makeText(Plant.this, "Stored...", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(Plant.this, "Error..!!!" + task.getException(), Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
     }
-     public void fillSnp(){
+
+    public void fillSnp() {
         Query q = t_LRef.child("T_Ctlg");
-         q.addValueEventListener(new ValueEventListener() {
-             @Override
-             public void onDataChange(DataSnapshot dataSnapshot) {
-                 // Is better to use a List, because you don't know the size
-                 // of the iterator returned by dataSnapshot.getChildren() to
-                 // initialize the array
-                 for (DataSnapshot areaSnapshot: dataSnapshot.getChildren()) {
-                     String tName = areaSnapshot.child("name").getValue(String.class);
-                     if (!trees.contains(tName)){
-                         trees.add(tName);
-                     }
-                 }
+        final ArrayAdapter<String> tAdapter = new ArrayAdapter<>(Plant.this, android.R.layout.simple_spinner_item, trees);
+        tAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        tSpinner.setAdapter(tAdapter);
+        q.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                tAdapter.notifyDataSetChanged();
+            }
 
-                 ArrayAdapter<String> tAdapter = new ArrayAdapter<>(Plant.this, android.R.layout.simple_spinner_item, trees);
-                 tAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                 tSpinner.setAdapter(tAdapter);
-             }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
 
-             @Override
-             public void onCancelled(DatabaseError databaseError) {
+            }
+        });
+        q.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
 
-             }
-         });
-     }
+                String tName = dataSnapshot.child("name").getValue(String.class);
+                String ke = dataSnapshot.child("name").getKey();
+                if (!trees.contains(tName)) {
+                    trees.add(tName);
+                }
+                tAdapter.notifyDataSetChanged();
+
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                String value = dataSnapshot.child("name").getValue(String.class);
+                String ke = dataSnapshot.child("name").getKey();
+                trees.remove(value);
+                tAdapter.remove(String.valueOf(tAdapter.getPosition(value)));
+                trees.add(value);
+                tAdapter.notifyDataSetChanged();
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                String tName = dataSnapshot.child("name").getValue(String.class);
+                if (trees.contains(tName)) {
+                    trees.remove(tName);
+                }
+                tAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    public void fillMap() {
+        Query q = p_LRef.child("Planted");
+        q.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                for (DataSnapshot areaSnapshot : dataSnapshot.getChildren()) {
+                    String idu = areaSnapshot.child("id_enc").getValue(String.class);
+                    Log.d("DB1 idu: ", "" + idu);
+                    Log.d("Local1 idu: ", "" + uid);
+                    if (uid == idu) {
+                        String lat = areaSnapshot.child("lat").getValue(String.class);
+                        String lng = areaSnapshot.child("lng").getValue(String.class);
+                        Log.d("Lat 1: ", "" + lat);
+                        Log.d("Lng 1: ", "" + lng);
+                        //String title = areaSnapshot.child("type").getValue(String.class);
+                        LatLng t2 = new LatLng(Double.parseDouble(lat), Double.parseDouble(lng));
+                        marker.setPosition(t2);
+                        marker.setVisible(true);
+                        mMap.addMarker(new MarkerOptions().position(t2).title("Tree").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+                        float zoom = 16;
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(t2, zoom));
+                    }
+                }
+
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        q.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // Is better to use a List, because you don't know the size
+                // of the iterator returned by dataSnapshot.getChildren() to
+                // initialize the array
+                for (DataSnapshot areaSnapshot : dataSnapshot.getChildren()) {
+                    String idu = areaSnapshot.child("id_enc").getValue(String.class);
+                    Log.d("DB2 idu: ", "" + idu);
+                    Log.d("Local2 idu: ", "" + uid);
+                    if (uid == idu) {
+                        String lat = areaSnapshot.child("lat").getValue(String.class);
+                        String lng = areaSnapshot.child("lng").getValue(String.class);
+                        String title = areaSnapshot.child("type").getValue(String.class);
+                        Log.d("Lat 2: ", "" + lat);
+                        Log.d("Lng 2: ", "" + lng);
+
+                        LatLng t2 = new LatLng(Double.parseDouble(lat), Double.parseDouble(lng));
+                        mMap.addMarker(new MarkerOptions().position(t2).title(title).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+                        float zoom = 16;
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(t2, zoom));
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -292,9 +407,9 @@ public class Plant extends FragmentActivity implements OnMapReadyCallback, View.
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.btn_Add:
-                AddMarker();
+                fillMap();
                 break;
             case R.id.btn_Save:
                 Save();
@@ -306,29 +421,29 @@ public class Plant extends FragmentActivity implements OnMapReadyCallback, View.
     }
 
     private void addT() {
-        String d="",n="",v="";
-        for (int i=0;i<3;i++){
-            if (i==0){
-                d="1";
-                n="Pino";
-                v="1";
-            }else if (i==1){
-                d="2";
-                n="Durazno";
-                v="2";
-            }else if (i==2){
-                d="3";
-                n="Ciruelo";
-                v="3";
+        String d = "", n = "", v = "";
+        for (int i = 0; i < 3; i++) {
+            if (i == 0) {
+                d = "1";
+                n = "Pino";
+                v = "1";
+            } else if (i == 1) {
+                d = "2";
+                n = "Durazno";
+                v = "2";
+            } else if (i == 2) {
+                d = "3";
+                n = "Ciruelo";
+                v = "3";
             }
-           Tree t1 = new Tree(d,n,"O","S",v);
+            Tree t1 = new Tree(d, n, "O", "S", v);
             mDatabase.child("T_Ctlg").push().setValue(t1).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
-                    if (task.isSuccessful()){
-                        Toast.makeText(Plant.this,"Stored...", Toast.LENGTH_SHORT).show();
-                    }else{
-                        Toast.makeText(Plant.this,"Error..!!!", Toast.LENGTH_SHORT).show();
+                    if (task.isSuccessful()) {
+                        Toast.makeText(Plant.this, "Stored...", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(Plant.this, "Error..!!!", Toast.LENGTH_SHORT).show();
                     }
                 }
             });

@@ -21,8 +21,9 @@
         android:theme="@style/Theme.AppCompat.DayNight">
         <activity android:name=".Splash_Screen">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity android:name=".Views.Own" />
@@ -44,7 +45,8 @@
             android:name=".Views.Plant"
             android:label="@string/title_activity_plant" />
         <activity android:name=".MainActivity" />
-        <activity android:name=".Login"></activity>
+        <activity android:name=".Login" />
+        <activity android:name=".Views.Profile"></activity>
     </application>
 
 </manifest>

@@ -16,16 +16,18 @@ import com.coding.jjlop.forestappv4.Views.Adopt;
 import com.coding.jjlop.forestappv4.Views.Exchange;
 import com.coding.jjlop.forestappv4.Views.Own;
 import com.coding.jjlop.forestappv4.Views.Plant;
+import com.coding.jjlop.forestappv4.Views.Profile;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
     GridView gvm;
-    String[] values={"Owns","Plant","Exchange","Adopt"};
+    String[] values={"Owns","Plant","Exchange","Adopt","Profile"};
     int[] images={
             R.drawable.own,
             R.drawable.plant,
             R.drawable.exchange,
-            R.drawable.adopt
+            R.drawable.adopt,
+            R.drawable.plant
     };
     String uid;
 
@@ -87,6 +89,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
         if (i==3){
             Intent it = new Intent(MainActivity.this,Adopt.class);
+            it.putExtra("Uid",uid);
+            startActivity(it);
+        }
+        if (i==4){
+            Intent it = new Intent(MainActivity.this,Profile.class);
             it.putExtra("Uid",uid);
             startActivity(it);
         }

@@ -1,7 +1,9 @@
 package com.coding.jjlop.forestappv4.Views;
 
+import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -12,6 +14,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -22,7 +25,7 @@ public class Own extends AppCompatActivity {
     private ListView ListV;
     private DatabaseReference mDataBase;
     private ArrayList<String> tree_List = new ArrayList<>();
-    private ArrayList<String> keys_List= new ArrayList();
+    private ArrayList<String> keys_List = new ArrayList();
     private String uid;
 
     @Override
@@ -30,39 +33,20 @@ public class Own extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_own);
         uid = getIntent().getStringExtra("Uid");
-        mDataBase= FirebaseDatabase.getInstance().getReference().child("Trees");
-        ListV= findViewById(R.id.T_List);
+        mDataBase = FirebaseDatabase.getInstance().getReference();
+        ListV = findViewById(R.id.T_List);
+        final List<String> trees = new ArrayList<>();
+        final ArrayAdapter<String> tAdapter = new ArrayAdapter<>(Own.this, android.R.layout.simple_expandable_list_item_1, trees);
+        tAdapter.setDropDownViewResource(android.R.layout.simple_expandable_list_item_1);
+        ListV.setAdapter(tAdapter);
 
-        final ArrayAdapter<String> arrayAdapter=new ArrayAdapter<>(this,android.R.layout.simple_expandable_list_item_1,tree_List);
-        ListV.setAdapter(arrayAdapter);
 
-        mDataBase.addChildEventListener(new ChildEventListener() {
+        Query q = mDataBase.child("Planted");
+
+        q.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                String value= dataSnapshot.getValue(String.class);
-                tree_List.add(value);
-                arrayAdapter.notifyDataSetChanged();
-                String key = dataSnapshot.getKey();
-                keys_List.add(key);
-
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                String value= dataSnapshot.getValue(String.class);
-                String key= dataSnapshot.getKey();
-                int index = keys_List.indexOf(key);
-                tree_List.set(index,value);
-                arrayAdapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                tAdapter.notifyDataSetChanged();
             }
 
             @Override
@@ -70,10 +54,46 @@ public class Own extends AppCompatActivity {
 
             }
         });
-        mDataBase.addValueEventListener(new ValueEventListener() {
+
+        q.addChildEventListener(new ChildEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                arrayAdapter.notifyDataSetChanged();
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                String id = dataSnapshot.child("id_enc").getValue(String.class);
+                Log.d("IdL:",""+id);
+                Log.d("IdDB:",""+id);
+                Log.d("",""+dataSnapshot.child("type").getValue(String.class));
+                if (uid.equals(id)){
+                    String value = dataSnapshot.child("type").getValue(String.class);
+                    Log.d("Fuck Yeah!!",""+dataSnapshot.child("type").getValue(String.class));
+                    trees.add(value);
+                    tAdapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                String id = dataSnapshot.child("id_enc").getValue(String.class);
+                if (uid == id) {
+                    String value = dataSnapshot.child("name").getValue(String.class);
+                    trees.remove(value);
+                    trees.add(value);
+                    tAdapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                String id = dataSnapshot.child("id_enc").getValue(String.class);
+                if (uid == id) {
+                    String value = dataSnapshot.child("name").getValue(String.class);
+                    trees.remove(value);
+                    tAdapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
             }
 
             @Override
