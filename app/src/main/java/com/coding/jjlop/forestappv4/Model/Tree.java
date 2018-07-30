@@ -14,19 +14,21 @@ public class Tree {
     private String species;
     @PropertyName("value")
     private String value;
+    @PropertyName("i_perd")
+    private String i_perd;
 
-    public Tree(){
+    public Tree() {
         //Requiered for FireBase
     }
 
 
-
-    public Tree(String id_t, String name, String order, String species, String value) {
+    public Tree(String id_t, String name, String order, String species, String value, String i_perd) {
         this.id_t = id_t;
         this.name = name;
         this.order = order;
         this.species = species;
         this.value = value;
+        this.i_perd = i_perd;
     }
 
     public String getName() {
@@ -69,6 +71,14 @@ public class Tree {
         this.id_t = id_t;
     }
 
+    public String getI_perd() {
+        return i_perd;
+    }
+
+    public void setI_perd(String i_perd) {
+        this.i_perd = i_perd;
+    }
+
     @Override
     public String toString() {
         return "Tree{" +
@@ -77,6 +87,7 @@ public class Tree {
                 ", order='" + order + '\'' +
                 ", species='" + species + '\'' +
                 ", value='" + value + '\'' +
+                ", i_perd='" + i_perd + '\'' +
                 '}';
     }
 }

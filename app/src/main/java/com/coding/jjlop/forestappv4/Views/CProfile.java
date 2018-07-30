@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,6 +13,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.coding.jjlop.forestappv4.Login;
+import com.coding.jjlop.forestappv4.MainActivity;
 import com.coding.jjlop.forestappv4.Model.User;
 import com.coding.jjlop.forestappv4.R;
 import com.google.android.gms.auth.api.Auth;
@@ -33,49 +33,40 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-public class Profile extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
-
+public class CProfile extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
     private ImageView photoImageView;
-    private TextView txt_nick, txt_email,txt_p, txt_d, txt_q;
+    private TextView txt_nick, txt_email;
+    private EditText txt_d, txt_q;
     private Button b1;
     private DatabaseReference mDatabase;
     private GoogleApiClient googleApiClient;
     private FirebaseAuth firebaseAuth;
     private FirebaseAuth.AuthStateListener firebaseAuthListener;
     private FirebaseUser user;
-    String uid, d, qu,p;
+    String uid, d, qu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_profile);
+        setContentView(R.layout.activity_cprofile);
+        uid = getIntent().getStringExtra("Uid");
         mDatabase = FirebaseDatabase.getInstance().getReference();
         photoImageView = findViewById(R.id.photoImageView);
         txt_nick = findViewById(R.id.txt_nick);
         txt_email = findViewById(R.id.txt_email);
-        txt_p= findViewById(R.id.txt_points);
-        txt_d = findViewById(R.id.txt_d);
-        txt_q = findViewById(R.id.txt_q);
-        b1 = findViewById(R.id.btn1);
+        txt_d = findViewById(R.id.txt_de);
+        txt_q = findViewById(R.id.txt_qu);
+        b1 = findViewById(R.id.btn_inf);
         b1.setOnClickListener(this);
-
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .build();
-
-        googleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this, this)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();
 
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 user = firebaseAuth.getCurrentUser();
+                setUserData(user);
                 if (user != null) {
-                    setUserData(user);
-                    fData(user);
+                    Check();
                 } else {
                     goLogInScreen();
                 }
@@ -93,7 +84,6 @@ public class Profile extends AppCompatActivity implements GoogleApiClient.OnConn
     @Override
     protected void onStart() {
         super.onStart();
-
         firebaseAuth.addAuthStateListener(firebaseAuthListener);
     }
 
@@ -101,35 +91,6 @@ public class Profile extends AppCompatActivity implements GoogleApiClient.OnConn
         Intent intent = new Intent(this, Login.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
-    }
-
-    public void logOut() {
-        firebaseAuth.signOut();
-
-        Auth.GoogleSignInApi.signOut(googleApiClient).setResultCallback(new ResultCallback<Status>() {
-            @Override
-            public void onResult(@NonNull Status status) {
-                if (status.isSuccess()) {
-                    goLogInScreen();
-                } else {
-                    Toast.makeText(getApplicationContext(), "Error Main", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-    }
-
-    public void revoke() {
-        firebaseAuth.signOut();
-
-        Auth.GoogleSignInApi.revokeAccess(googleApiClient).setResultCallback(new ResultCallback<Status>() {
-            @Override
-            public void onResult(@NonNull Status status) {
-                if (status.isSuccess()) {
-                    goLogInScreen();
-                } else {
-                }
-            }
-        });
     }
 
     @Override
@@ -157,31 +118,22 @@ public class Profile extends AppCompatActivity implements GoogleApiClient.OnConn
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 dataSnapshot.getValue(String.class);
-                if (dataSnapshot.getChildrenCount()==0) {
-                    User u = new User(uid, user.getDisplayName(), user.getEmail(), txt_d.getText().toString(), txt_q.getText().toString(), "0");
+                if (dataSnapshot.getChildrenCount() == 0) {
+                    User u = new User(uid, getIntent().getStringExtra("Name"), getIntent().getStringExtra("Email"), txt_d.getText().toString(), txt_q.getText().toString(), "0");
                     mDatabase.child("Users").push().setValue(u).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful()) {
-                                Toast.makeText(Profile.this, "Stored...", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(CProfile.this, "Stored...", Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                intent.putExtra("Uid", uid);
+                                startActivity(intent);
                             } else {
-                                Toast.makeText(Profile.this, "Error..!!!" + task.getException(), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(CProfile.this, "Error..!!!" + task.getException(), Toast.LENGTH_SHORT).show();
                             }
                         }
                     });
-                } else {
-                    User u = new User(uid, user.getDisplayName(), user.getEmail(), txt_d.getText().toString(), txt_q.getText().toString(), "0");
-                    mDatabase.child("Users").child(uid).setValue(u).addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful()) {
-                                Toast.makeText(Profile.this, "Saving Changes...", Toast.LENGTH_SHORT).show();
-                            } else {
-                                Toast.makeText(Profile.this, "Error..!!!" + task.getException(), Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    });
-
                 }
             }
 
@@ -192,22 +144,28 @@ public class Profile extends AppCompatActivity implements GoogleApiClient.OnConn
         });
     }
 
-    public void fData(final FirebaseUser user1) {
-        final Query q = mDatabase.child("Users");
-        //Query q = mDatabase.child("T_Ctlg");
-        q.addValueEventListener(new ValueEventListener() {
+   public void Check() {
+        Query query = mDatabase.child("Users").orderByChild("id_u").equalTo(uid);
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot areaSnapshot : dataSnapshot.getChildren()) {
-                    String tName = areaSnapshot.child("id_u").getValue(String.class);
-                    if (tName.equals(user1.getUid())) {
-                        p = areaSnapshot.child("t_points").getValue(String.class);
-                        d = areaSnapshot.child("degree").getValue(String.class);
-                        qu = areaSnapshot.child("quarter").getValue(String.class);
-                        txt_p.setText("Total Points: "+p);
-                        txt_d.setText("Degree: "+d);
-                        txt_q.setText("Quarter: "+qu);
-                    }
+                if (dataSnapshot.getChildrenCount() == 0) {
+                    firebaseAuth = FirebaseAuth.getInstance();
+                    firebaseAuthListener = new FirebaseAuth.AuthStateListener() {
+                        @Override
+                        public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                            user = firebaseAuth.getCurrentUser();
+                            if (user != null) {
+                            } else {
+                                goLogInScreen();
+                            }
+                        }
+                    };
+                } else {
+                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.putExtra("Uid", uid);
+                    startActivity(intent);
                 }
             }
 
@@ -221,9 +179,12 @@ public class Profile extends AppCompatActivity implements GoogleApiClient.OnConn
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.btn1:
-                logOut();
-                revoke();
+            case R.id.btn_inf:
+                if (!txt_d.getText().equals("") && !txt_q.getText().equals("")){
+                    Save();
+                }else{
+                    Toast.makeText(CProfile.this, "Please fill the fields", Toast.LENGTH_SHORT).show();
+                }
                 break;
         }
     }

@@ -24,8 +24,8 @@ public class Own extends AppCompatActivity {
 
     private ListView ListV;
     private DatabaseReference mDataBase;
-    private ArrayList<String> tree_List = new ArrayList<>();
-    private ArrayList<String> keys_List = new ArrayList();
+    //private ArrayList<String> tree_List = new ArrayList<>();
+    //private ArrayList<String> keys_List = new ArrayList();
     private String uid;
 
     @Override
@@ -35,11 +35,15 @@ public class Own extends AppCompatActivity {
         uid = getIntent().getStringExtra("Uid");
         mDataBase = FirebaseDatabase.getInstance().getReference();
         ListV = findViewById(R.id.T_List);
+        Show_mt();
+    }
+
+    public void Show_mt() {
+
         final List<String> trees = new ArrayList<>();
         final ArrayAdapter<String> tAdapter = new ArrayAdapter<>(Own.this, android.R.layout.simple_expandable_list_item_1, trees);
         tAdapter.setDropDownViewResource(android.R.layout.simple_expandable_list_item_1);
         ListV.setAdapter(tAdapter);
-
 
         Query q = mDataBase.child("Planted");
 
@@ -51,20 +55,15 @@ public class Own extends AppCompatActivity {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
             }
         });
 
         q.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                String id = dataSnapshot.child("id_enc").getValue(String.class);
-                Log.d("IdL:",""+id);
-                Log.d("IdDB:",""+id);
-                Log.d("",""+dataSnapshot.child("type").getValue(String.class));
-                if (uid.equals(id)){
+                String id = dataSnapshot.child("id_at").getValue(String.class);
+                if (uid.equals(id)) {
                     String value = dataSnapshot.child("type").getValue(String.class);
-                    Log.d("Fuck Yeah!!",""+dataSnapshot.child("type").getValue(String.class));
                     trees.add(value);
                     tAdapter.notifyDataSetChanged();
                 }
@@ -72,33 +71,30 @@ public class Own extends AppCompatActivity {
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                String id = dataSnapshot.child("id_enc").getValue(String.class);
-                if (uid == id) {
-                    String value = dataSnapshot.child("name").getValue(String.class);
-                    trees.remove(value);
-                    trees.add(value);
-                    tAdapter.notifyDataSetChanged();
-                }
+                trees.clear();
+                tAdapter.clear();
+                Show_mt();
+                tAdapter.notifyDataSetChanged();
             }
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
-                String id = dataSnapshot.child("id_enc").getValue(String.class);
-                if (uid == id) {
-                    String value = dataSnapshot.child("name").getValue(String.class);
-                    trees.remove(value);
+                String id = dataSnapshot.child("id_at").getValue(String.class);
+                String tName = dataSnapshot.child("name").getValue(String.class);
+                if (trees.contains(tName) && (uid == id)) {
+                    trees.clear();
+                    tAdapter.clear();
+                    Show_mt();
                     tAdapter.notifyDataSetChanged();
                 }
             }
 
             @Override
             public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
             }
         });
     }

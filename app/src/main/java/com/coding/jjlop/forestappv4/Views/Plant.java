@@ -13,18 +13,21 @@ import android.location.LocationManager;
 import android.provider.ContactsContract;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.constraint.solver.widgets.Snapshot;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.coding.jjlop.forestappv4.MainActivity;
 import com.coding.jjlop.forestappv4.Model.Planted;
 import com.coding.jjlop.forestappv4.Model.Tree;
 import com.coding.jjlop.forestappv4.R;
@@ -41,6 +44,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -199,6 +203,13 @@ public class Plant extends FragmentActivity implements OnMapReadyCallback, View.
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(t1, zoom));
     }
 
+    public void AddmMarker(String lat, String lng, String t) {
+        LatLng t1 = new LatLng(Double.parseDouble(lat), Double.parseDouble(lng));
+        mMap.addMarker(new MarkerOptions().position(t1).title(t).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+        float zoom = 16;
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(t1, zoom));
+    }
+
 
     public void Save() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
@@ -240,10 +251,6 @@ public class Plant extends FragmentActivity implements OnMapReadyCallback, View.
         });
 
         Planted p = new Planted(uid, Lat, Lng, fecha, t);
-       /* Map dataMap= new HashMap();
-        dataMap.put("Id_P",uid);
-        dataMap.put("Lat",Lat);
-        dataMap.put("Lng",Lng);*/
         mDatabase.child("Planted").push().setValue(p).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
@@ -288,13 +295,10 @@ public class Plant extends FragmentActivity implements OnMapReadyCallback, View.
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                String value = dataSnapshot.child("name").getValue(String.class);
-                String ke = dataSnapshot.child("name").getKey();
-                trees.remove(value);
-                tAdapter.remove(String.valueOf(tAdapter.getPosition(value)));
-                trees.add(value);
+                trees.clear();
+                tAdapter.clear();
+                fillSnp();
                 tAdapter.notifyDataSetChanged();
-
             }
 
             @Override
@@ -319,73 +323,29 @@ public class Plant extends FragmentActivity implements OnMapReadyCallback, View.
     }
 
     public void fillMap() {
-        Query q = p_LRef.child("Planted");
-        q.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                for (DataSnapshot areaSnapshot : dataSnapshot.getChildren()) {
-                    String idu = areaSnapshot.child("id_enc").getValue(String.class);
-                    Log.d("DB1 idu: ", "" + idu);
-                    Log.d("Local1 idu: ", "" + uid);
-                    if (uid == idu) {
-                        String lat = areaSnapshot.child("lat").getValue(String.class);
-                        String lng = areaSnapshot.child("lng").getValue(String.class);
-                        Log.d("Lat 1: ", "" + lat);
-                        Log.d("Lng 1: ", "" + lng);
-                        //String title = areaSnapshot.child("type").getValue(String.class);
-                        LatLng t2 = new LatLng(Double.parseDouble(lat), Double.parseDouble(lng));
-                        marker.setPosition(t2);
-                        marker.setVisible(true);
-                        mMap.addMarker(new MarkerOptions().position(t2).title("Tree").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
-                        float zoom = 16;
-                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(t2, zoom));
-                    }
-                }
-
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-        q.addValueEventListener(new ValueEventListener() {
+        Query query = mDatabase.child("Planted").orderByChild("id_at").equalTo(uid);
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                // Is better to use a List, because you don't know the size
-                // of the iterator returned by dataSnapshot.getChildren() to
-                // initialize the array
-                for (DataSnapshot areaSnapshot : dataSnapshot.getChildren()) {
-                    String idu = areaSnapshot.child("id_enc").getValue(String.class);
-                    Log.d("DB2 idu: ", "" + idu);
-                    Log.d("Local2 idu: ", "" + uid);
-                    if (uid == idu) {
-                        String lat = areaSnapshot.child("lat").getValue(String.class);
-                        String lng = areaSnapshot.child("lng").getValue(String.class);
-                        String title = areaSnapshot.child("type").getValue(String.class);
-                        Log.d("Lat 2: ", "" + lat);
-                        Log.d("Lng 2: ", "" + lng);
+                if (dataSnapshot.getChildrenCount() > 0) {
+                    dataSnapshot.getRef().addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            for (DataSnapshot areaSnapshot : dataSnapshot.getChildren()) {
+                                String lat = areaSnapshot.child("lat").getValue(String.class);
+                                String lng = areaSnapshot.child("lng").getValue(String.class);
+                                String t = areaSnapshot.child("type").getValue(String.class);
+                                AddmMarker(lat, lng, t);
+                            }
+                        }
 
-                        LatLng t2 = new LatLng(Double.parseDouble(lat), Double.parseDouble(lng));
-                        mMap.addMarker(new MarkerOptions().position(t2).title(title).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
-                        float zoom = 16;
-                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(t2, zoom));
-                    }
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+                } else {
+
                 }
             }
 
@@ -409,7 +369,7 @@ public class Plant extends FragmentActivity implements OnMapReadyCallback, View.
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_Add:
-                fillMap();
+                AddMarker();
                 break;
             case R.id.btn_Save:
                 Save();
@@ -421,22 +381,25 @@ public class Plant extends FragmentActivity implements OnMapReadyCallback, View.
     }
 
     private void addT() {
-        String d = "", n = "", v = "";
+        String d = "", n = "", v = "", ip = "";
         for (int i = 0; i < 3; i++) {
             if (i == 0) {
                 d = "1";
                 n = "Pino";
                 v = "1";
+                ip = "6";
             } else if (i == 1) {
                 d = "2";
                 n = "Durazno";
                 v = "2";
+                ip = "4";
             } else if (i == 2) {
                 d = "3";
                 n = "Ciruelo";
                 v = "3";
+                ip = "3";
             }
-            Tree t1 = new Tree(d, n, "O", "S", v);
+            Tree t1 = new Tree(d, n, "O", "S", v, ip);
             mDatabase.child("T_Ctlg").push().setValue(t1).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {

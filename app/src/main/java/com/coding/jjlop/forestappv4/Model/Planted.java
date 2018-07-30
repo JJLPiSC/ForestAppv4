@@ -1,28 +1,26 @@
 package com.coding.jjlop.forestappv4.Model;
 
-import java.util.HashMap;
-
 public class Planted {
-    private String id_enc;
+    private String id_at;
     private String lat;
     private String lng;
     private String d_plant;
     private String type;
 
-    public Planted(String id_enc, String lat, String lng, String d_plant, String type) {
-        this.id_enc = id_enc;
+    public Planted(String id_at, String lat, String lng, String d_plant, String type) {
+        this.id_at = id_at;
         this.lat = lat;
         this.lng = lng;
         this.d_plant = d_plant;
         this.type = type;
     }
 
-    public String getId_enc() {
-        return id_enc;
+    public String getId_at() {
+        return id_at;
     }
 
-    public void setId_enc(String id_enc) {
-        this.id_enc = id_enc;
+    public void setId_at(String id_at) {
+        this.id_at = id_at;
     }
 
     public String getLat() {
