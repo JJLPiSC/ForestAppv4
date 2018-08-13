@@ -151,14 +151,14 @@ public class Profile extends AppCompatActivity implements GoogleApiClient.OnConn
 
     }
 
-    public void Save() {
+    /*public void Save() {
         Query query = mDatabase.child("Users").orderByChild("id_u").equalTo(uid);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 dataSnapshot.getValue(String.class);
                 if (dataSnapshot.getChildrenCount()==0) {
-                    User u = new User(uid, user.getDisplayName(), user.getEmail(), txt_d.getText().toString(), txt_q.getText().toString(), "0");
+                    User u = new User(uid, user.getDisplayName(), user.getEmail(), txt_d.getText().toString(), txt_q.getText().toString(), "0","");
                     mDatabase.child("Users").push().setValue(u).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
@@ -170,7 +170,7 @@ public class Profile extends AppCompatActivity implements GoogleApiClient.OnConn
                         }
                     });
                 } else {
-                    User u = new User(uid, user.getDisplayName(), user.getEmail(), txt_d.getText().toString(), txt_q.getText().toString(), "0");
+                    User u = new User(uid, user.getDisplayName(), user.getEmail(), txt_d.getText().toString(), txt_q.getText().toString(), "0","");
                     mDatabase.child("Users").child(uid).setValue(u).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
@@ -190,7 +190,7 @@ public class Profile extends AppCompatActivity implements GoogleApiClient.OnConn
 
             }
         });
-    }
+    }*/
 
     public void fData(final FirebaseUser user1) {
         final Query q = mDatabase.child("Users");

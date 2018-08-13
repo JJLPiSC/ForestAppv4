@@ -2,7 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:layout_centerHorizontal="true">
 
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -11,65 +12,113 @@
         <android.support.v7.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="5dp">
+            android:layout_margin="10dp"
+            android:padding="20dp">
 
             <RelativeLayout
+                android:id="@+id/rl"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="8dp">
+                android:padding="10dp">
 
                 <ImageView
                     android:id="@+id/imageView"
                     android:layout_width="120dp"
-                    android:layout_height="90dp"
-                    android:padding="4dp" />
+                    android:layout_height="120dp"
+                    android:layout_marginTop="10dp"
+                    android:padding="5dp" />
 
                 <TextView
-                    android:id="@+id/textViewTitle"
+                    android:id="@+id/tv_T"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:layout_toRightOf="@id/imageView"
-                    android:text="Apple MacBook Air Core i5 5th Gen - (8 GB/128 GB SSD/Mac OS Sierra)"
-                    android:textAppearance="@style/Base.TextAppearance.AppCompat.Small"
+                    android:layout_marginStart="15dp"
+                    android:layout_toEndOf="@id/imageView"
+                    android:text="Name"
+                    android:textStyle="bold"
+                    android:textAppearance="@style/Base.TextAppearance.AppCompat.Large.Inverse"
                     android:textColor="#000000" />
 
                 <TextView
-                    android:id="@+id/textViewShortDesc"
+                    android:id="@+id/tv_D"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/textViewTitle"
-                    android:layout_marginLeft="5dp"
+                    android:layout_below="@id/tv_T"
+                    android:layout_marginStart="15dp"
                     android:layout_marginTop="5dp"
-                    android:layout_toRightOf="@id/imageView"
-                    android:text="13.3 Inch, 256 GB"
+                    android:layout_toEndOf="@id/imageView"
+                    android:text="dd/mm/yyyy"
                     android:textAppearance="@style/Base.TextAppearance.AppCompat.Small" />
 
-                <Button
-                    android:id="@+id/textViewRating"
-                    android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/tv_O"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/textViewShortDesc"
-                    android:layout_marginLeft="5dp"
+                    android:layout_below="@id/tv_D"
+                    android:layout_marginStart="15dp"
                     android:layout_marginTop="5dp"
-                    android:layout_toRightOf="@id/imageView"
+                    android:layout_toEndOf="@id/imageView"
+                    android:text="Order"
+                    android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium" />
+
+                <TextView
+                    android:id="@+id/tv_S"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tv_O"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_toEndOf="@id/imageView"
+                    android:text="Specie"
+                    android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"/>
+                <TextView
+                    android:id="@+id/tv_V"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tv_S"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_toEndOf="@id/imageView"
+                    android:text="Value"
+                    android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium" />
+                <TextView
+                    android:id="@+id/tv_PK"
+                    android:text="PK"
+                    android:textColor="#FFF"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tv_V"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="5dp"
+                    android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium" />
+
+                <Button
+                    android:id="@+id/btn_W"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="25dp"
+                    android:layout_marginTop="15dp"
+                    android:layout_toEndOf="@id/tv_D"
                     android:background="@color/colorPrimary"
                     android:paddingLeft="15dp"
                     android:paddingRight="15dp"
-                    android:text="Exchange"
+                    android:text="Water"
                     android:textAppearance="@style/Base.TextAppearance.AppCompat.Small.Inverse"
                     android:textStyle="bold" />
 
-                <TextView
-                    android:id="@+id/textViewPrice"
+                <Button
+                    android:id="@+id/btn_E"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/textViewRating"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginTop="5dp"
-                    android:layout_toRightOf="@id/imageView"
-                    android:text="INR 56990"
-                    android:textAppearance="@style/Base.TextAppearance.AppCompat.Large"
+                    android:layout_below="@id/btn_W"
+                    android:layout_marginStart="25dp"
+                    android:layout_marginTop="15dp"
+                    android:layout_toEndOf="@id/tv_D"
+                    android:background="@android:color/holo_orange_dark"
+                    android:paddingLeft="5dp"
+                    android:paddingRight="5dp"
+                    android:text="Exchange"
+                    android:textAppearance="@style/Base.TextAppearance.AppCompat.Small.Inverse"
                     android:textStyle="bold" />
 
             </RelativeLayout>

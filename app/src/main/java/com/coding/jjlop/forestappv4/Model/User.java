@@ -7,14 +7,24 @@ public class User {
     private String degree;
     private String quarter;
     private String t_points;
+    private String expassw;
 
-    public User(String id_u, String nick, String email, String degree, String quarter, String t_points) {
+    public User(String id_u, String nick, String email, String degree, String quarter, String t_points, String expassw) {
         this.id_u = id_u;
         this.nick = nick;
         this.email = email;
         this.degree = degree;
         this.quarter = quarter;
         this.t_points = t_points;
+        this.expassw=expassw;
+    }
+
+    public String getExpassw() {
+        return expassw;
+    }
+
+    public void setExpassw(String expassw) {
+        this.expassw = expassw;
     }
 
     public String getId_u() {

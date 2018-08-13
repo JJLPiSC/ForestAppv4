@@ -1,10 +1,17 @@
 package com.coding.jjlop.forestappv4.Model;
 
+import com.google.firebase.database.PropertyName;
+
 public class Planted {
+    @PropertyName("id_at")
     private String id_at;
+    @PropertyName("lat")
     private String lat;
+    @PropertyName("lng")
     private String lng;
+    @PropertyName("d_plant")
     private String d_plant;
+    @PropertyName("type")
     private String type;
 
     public Planted(String id_at, String lat, String lng, String d_plant, String type) {

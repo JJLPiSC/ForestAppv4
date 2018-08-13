@@ -5,10 +5,12 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
 
 import com.coding.jjlop.forestappv4.Adapter.ExchAdapter;
 import com.coding.jjlop.forestappv4.Model.Tree;
 import com.coding.jjlop.forestappv4.R;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -21,10 +23,11 @@ import java.util.List;
 
 public class Exchange extends AppCompatActivity {
 
-    List<Tree> tList;
-    RecyclerView recyclerView;
+    private List<Tree> tList;
+    private RecyclerView recyclerView;
     private DatabaseReference mDataBase;
     private String uid;
+    private String d_p, type,id_t;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,50 +43,102 @@ public class Exchange extends AppCompatActivity {
         //initializing the productlist
         tList = new ArrayList<>();
 
-        //adding some items to our list
-        //fillList();
-
         //creating recyclerview adapter
-        ExchAdapter adapter = new ExchAdapter(this, fillList());
+        final ExchAdapter adapter = new ExchAdapter(this, fillList(),uid);
 
         //setting adapter to recyclerview
         recyclerView.setAdapter(adapter);
+
     }
 
-    public List<Tree> fillList(){
+    public List<Tree> fillList() {
         tList.clear();
         recyclerView.removeAllViews();
-        Query query = mDataBase.child("Planted").orderByChild("id_at").equalTo(uid);
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
+
+        Query q = mDataBase.child("Planted");
+
+        q.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.getChildrenCount() > 0) {
-                    dataSnapshot.getRef().addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            for (DataSnapshot areaSnapshot : dataSnapshot.getChildren()) {
-                                String lat = areaSnapshot.child("lat").getValue(String.class);
-                                String lng = areaSnapshot.child("lng").getValue(String.class);
-                                String t = areaSnapshot.child("type").getValue(String.class);
-                                String q = areaSnapshot.child("type").getValue(String.class);
-                                String b = areaSnapshot.child("type").getValue(String.class);
-                                String c = areaSnapshot.child("type").getValue(String.class);
+            public void onDataChange(DataSnapshot dataSnapshot) {}
 
-                                Tree tree = new Tree(q,lat,lng,t,b,c);
-                                //Tree tree = dataSnapshot.getValue(Tree.class);
-                                //t = String.valueOf(dataSnapshot.getValue());
-                                //t=tree.getName()
-                                tList.add(tree);
-                                Log.d("0",""+tree.getSpecies());
-                            }
-                        }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
 
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
-                        }
-                    });
+        Query query = mDataBase.child("Planted");
+        query.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                String id = dataSnapshot.child("id_at").getValue(String.class);
+                if (uid.equals(id)) {
+                    d_p = dataSnapshot.child("d_plant").getValue(String.class);
+                    type = dataSnapshot.child("type").getValue(String.class);
+                    id_t = dataSnapshot.getKey();
+                    c_list(d_p, type,id_t);
                 }
+                //////
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                //tList.clear();
+                //fillList();
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                //tList.clear();
+                //fillList();
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        return tList;
+    }
+
+    public List<Tree> c_list(final String d, final String t,final String it ) {
+        final String d_p=d;
+        final String type=t;
+        final String idt=it;
+        Query quer = mDataBase.child("T_Ctlg");
+        quer.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                String n = dataSnapshot.child("name").getValue(String.class);
+                if (type.equals(n)) {
+                    String o = dataSnapshot.child("order").getValue(String.class);
+                    String e = dataSnapshot.child("species").getValue(String.class);
+                    String v = dataSnapshot.child("value").getValue(String.class);
+                    String i = dataSnapshot.child("i_perd").getValue(String.class);
+                    Tree tree = new Tree(idt, t, o, e, v, i,d_p);
+                    tList.add(tree);
+                }
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                tList.clear();
+                fillList();
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                tList.clear();
+                fillList();
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
             }
 
             @Override

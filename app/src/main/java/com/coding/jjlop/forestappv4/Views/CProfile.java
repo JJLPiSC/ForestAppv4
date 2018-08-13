@@ -36,7 +36,7 @@ import com.google.firebase.database.ValueEventListener;
 public class CProfile extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
     private ImageView photoImageView;
     private TextView txt_nick, txt_email;
-    private EditText txt_d, txt_q;
+    private EditText txt_d, txt_q,txt_psw;
     private Button b1;
     private DatabaseReference mDatabase;
     private GoogleApiClient googleApiClient;
@@ -56,6 +56,7 @@ public class CProfile extends AppCompatActivity implements GoogleApiClient.OnCon
         txt_email = findViewById(R.id.txt_email);
         txt_d = findViewById(R.id.txt_de);
         txt_q = findViewById(R.id.txt_qu);
+        txt_psw = findViewById(R.id.txt_psw);
         b1 = findViewById(R.id.btn_inf);
         b1.setOnClickListener(this);
 
@@ -119,7 +120,7 @@ public class CProfile extends AppCompatActivity implements GoogleApiClient.OnCon
             public void onDataChange(DataSnapshot dataSnapshot) {
                 dataSnapshot.getValue(String.class);
                 if (dataSnapshot.getChildrenCount() == 0) {
-                    User u = new User(uid, getIntent().getStringExtra("Name"), getIntent().getStringExtra("Email"), txt_d.getText().toString(), txt_q.getText().toString(), "0");
+                    User u = new User(uid, getIntent().getStringExtra("Name"), getIntent().getStringExtra("Email"), txt_d.getText().toString(), txt_q.getText().toString(), "0",txt_psw.getText().toString());
                     mDatabase.child("Users").push().setValue(u).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {

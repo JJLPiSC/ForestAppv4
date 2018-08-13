@@ -17,10 +17,12 @@ public class Tree {
     @PropertyName("i_perd")
     private String i_perd;
 
+    @PropertyName("d_plant")
+    private String dp;
+
     public Tree() {
         //Requiered for FireBase
     }
-
 
     public Tree(String id_t, String name, String order, String species, String value, String i_perd) {
         this.id_t = id_t;
@@ -29,6 +31,23 @@ public class Tree {
         this.species = species;
         this.value = value;
         this.i_perd = i_perd;
+    }
+    public Tree(String id_t, String name, String order, String species, String value, String i_perd, String dp) {
+        this.id_t = id_t;
+        this.name = name;
+        this.order = order;
+        this.species = species;
+        this.value = value;
+        this.i_perd = i_perd;
+        this.dp = dp;
+    }
+
+    public String getDp() {
+        return dp;
+    }
+
+    public void setDp(String dp) {
+        this.dp = dp;
     }
 
     public String getName() {
