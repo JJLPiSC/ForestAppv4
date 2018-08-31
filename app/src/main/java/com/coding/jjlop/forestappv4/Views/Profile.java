@@ -204,9 +204,9 @@ public class Profile extends AppCompatActivity implements GoogleApiClient.OnConn
                         p = areaSnapshot.child("t_points").getValue(String.class);
                         d = areaSnapshot.child("degree").getValue(String.class);
                         qu = areaSnapshot.child("quarter").getValue(String.class);
-                        txt_p.setText("Total Points: "+p);
-                        txt_d.setText("Degree: "+d);
-                        txt_q.setText("Quarter: "+qu);
+                        txt_p.setText("Puntos Totales: "+p);
+                        txt_d.setText("Carrera: "+d);
+                        txt_q.setText("Cuatrimestre: "+qu);
                     }
                 }
             }

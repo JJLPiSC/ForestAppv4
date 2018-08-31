@@ -16,9 +16,14 @@ public class Tree {
     private String value;
     @PropertyName("i_perd")
     private String i_perd;
-
     @PropertyName("d_plant")
     private String dp;
+    @PropertyName("alias")
+    private String alias;
+    @PropertyName("lat")
+    private String lat;
+    @PropertyName("lng")
+    private String lng;
 
     public Tree() {
         //Requiered for FireBase
@@ -29,10 +34,12 @@ public class Tree {
         this.name = name;
         this.order = order;
         this.species = species;
+
         this.value = value;
         this.i_perd = i_perd;
     }
-    public Tree(String id_t, String name, String order, String species, String value, String i_perd, String dp) {
+
+    public Tree(String id_t, String name, String order, String species, String value, String i_perd, String dp, String alias, String lat, String Lng) {
         this.id_t = id_t;
         this.name = name;
         this.order = order;
@@ -40,6 +47,31 @@ public class Tree {
         this.value = value;
         this.i_perd = i_perd;
         this.dp = dp;
+        this.alias = alias;
+    }
+
+    public String getAlias() {
+        return alias;
+    }
+
+    public void setAlias(String alias) {
+        this.alias = alias;
+    }
+
+    public String getLat() {
+        return lat;
+    }
+
+    public void setLat(String lat) {
+        this.lat = lat;
+    }
+
+    public String getLng() {
+        return lng;
+    }
+
+    public void setLng(String lng) {
+        this.lng = lng;
     }
 
     public String getDp() {

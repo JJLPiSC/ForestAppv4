@@ -32,6 +32,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.shashank.sony.fancytoastlib.FancyToast;
 
 public class CProfile extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
     private ImageView photoImageView;
@@ -125,13 +126,13 @@ public class CProfile extends AppCompatActivity implements GoogleApiClient.OnCon
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful()) {
-                                Toast.makeText(CProfile.this, "Stored...", Toast.LENGTH_SHORT).show();
+                                FancyToast.makeText(getApplicationContext(), "Cuenta Completada!!!", Toast.LENGTH_SHORT, FancyToast.SUCCESS, true).show();
                                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                                 intent.putExtra("Uid", uid);
                                 startActivity(intent);
                             } else {
-                                Toast.makeText(CProfile.this, "Error..!!!" + task.getException(), Toast.LENGTH_SHORT).show();
+                                FancyToast.makeText(getApplicationContext(), "Operacion Fallida!!!", Toast.LENGTH_SHORT, FancyToast.ERROR, true).show();
                             }
                         }
                     });
@@ -184,7 +185,7 @@ public class CProfile extends AppCompatActivity implements GoogleApiClient.OnCon
                 if (!txt_d.getText().equals("") && !txt_q.getText().equals("")){
                     Save();
                 }else{
-                    Toast.makeText(CProfile.this, "Please fill the fields", Toast.LENGTH_SHORT).show();
+                    FancyToast.makeText(getApplicationContext(), "Por favor llene los campos!!!", Toast.LENGTH_SHORT, FancyToast.WARNING, true).show();
                 }
                 break;
         }

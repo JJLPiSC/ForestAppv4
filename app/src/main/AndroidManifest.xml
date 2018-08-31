@@ -47,7 +47,11 @@
         <activity android:name=".MainActivity" />
         <activity android:name=".Login" />
         <activity android:name=".Views.Profile" />
-        <activity android:name=".Views.CProfile"></activity>
+        <activity android:name=".Views.CProfile" />
+        <activity
+            android:name=".Views.s_Map"
+            android:label="@string/title_activity_s__map" />
+        <activity android:name=".Views.single_Map"></activity>
     </application>
 
 </manifest>

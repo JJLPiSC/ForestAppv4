@@ -9,12 +9,13 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -53,21 +54,19 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class Plant extends FragmentActivity implements OnMapReadyCallback, View.OnClickListener {
-
+public class single_Map extends FragmentActivity implements OnMapReadyCallback, View.OnClickListener {
     LocationManager locationManager;
     double longitudeNetwork, latitudeNetwork;
     TextView longitudeValueNetwork, latitudeValueNetwork;
-    Button btn1, btn2;
+    Button btn1;
     GoogleMap mMap;
     EditText txt_alias;
     Marker marker;
     Spinner tSpinner;
     private DatabaseReference mDatabase;
     final List<String> trees = new ArrayList<>();
-    final List<String> itrees = new ArrayList<>();
     String l, t, k;
-    String uid;
+    String uid,lat,lng;
     Tree tree;
 
     @Override
@@ -76,13 +75,12 @@ public class Plant extends FragmentActivity implements OnMapReadyCallback, View.
         setContentView(R.layout.activity_plant);
         mDatabase = FirebaseDatabase.getInstance().getReference();
         uid = getIntent().getStringExtra("Uid");
+        lat = getIntent().getStringExtra("Lat");
+        lng = getIntent().getStringExtra("Lng");
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         txt_alias = findViewById(R.id.txt_alias);
-        btn1 = findViewById(R.id.btn_Add);
-        btn2 = findViewById(R.id.btn_Save);
+        btn1 = findViewById(R.id.btn_ver);
         btn1.setOnClickListener(this);
-        btn2.setOnClickListener(this);
-        tSpinner = findViewById(R.id.snp_tr);
         longitudeValueNetwork = findViewById(R.id.longitudeValueNetwork);
         latitudeValueNetwork = findViewById(R.id.latitudeValueNetwork);
         int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getApplicationContext());
@@ -94,7 +92,6 @@ public class Plant extends FragmentActivity implements OnMapReadyCallback, View.
             Dialog d = GooglePlayServicesUtil.getErrorDialog(status, (Activity) getApplicationContext(), 10);
             d.show();
         }
-        fillSnp();
         fillMap();
     }
 
@@ -182,6 +179,7 @@ public class Plant extends FragmentActivity implements OnMapReadyCallback, View.
         mMap.addMarker(new MarkerOptions().position(t1).title(t).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
     }
 
+
     public void Save() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
         Date date = new Date();
@@ -194,71 +192,13 @@ public class Plant extends FragmentActivity implements OnMapReadyCallback, View.
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
-                    Toast.makeText(Plant.this, "Almacenado...", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(single_Map.this, "Almacenado...", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(Plant.this, "Intenta Otra Vez!!!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(single_Map.this, "Intenta Otra Vez!!!", Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
-    }
-
-    public void fillSnp() {
-        Query q = mDatabase.child("T_Ctlg");
-        final ArrayAdapter<String> tAdapter = new ArrayAdapter<>(Plant.this, android.R.layout.simple_spinner_item, trees);
-        tAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        tSpinner.setAdapter(tAdapter);
-        q.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                tAdapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-        q.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-
-                String tName = dataSnapshot.child("name").getValue(String.class);
-                String ke = dataSnapshot.child("name").getKey();
-                if (!trees.contains(tName)) {
-                    trees.add(tName);
-                }
-                tAdapter.notifyDataSetChanged();
-
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                trees.clear();
-                tAdapter.clear();
-                fillSnp();
-                tAdapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-                String tName = dataSnapshot.child("name").getValue(String.class);
-                if (trees.contains(tName)) {
-                    trees.remove(tName);
-                }
-                tAdapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
     }
 
     public void fillMap() {
@@ -309,46 +249,9 @@ public class Plant extends FragmentActivity implements OnMapReadyCallback, View.
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.btn_Add:
-                AddMarker();
-                break;
-            case R.id.btn_Save:
-                Save();
-                break;
-        }
-    }
+            case R.id.btn_ver:
 
-    //Insertar catalogo de Prueba de con 3 arboles
-    private void addT() {
-        String d = "", n = "", v = "", ip = "";
-        for (int i = 0; i < 3; i++) {
-            if (i == 0) {
-                d = "1";
-                n = "Pino";
-                v = "1";
-                ip = "6";
-            } else if (i == 1) {
-                d = "2";
-                n = "Durazno";
-                v = "2";
-                ip = "4";
-            } else if (i == 2) {
-                d = "3";
-                n = "Ciruelo";
-                v = "3";
-                ip = "3";
-            }
-            Tree t1 = new Tree(d, n, "O", "S", v, ip);
-            mDatabase.child("T_Ctlg").push().setValue(t1).addOnCompleteListener(new OnCompleteListener<Void>() {
-                @Override
-                public void onComplete(@NonNull Task<Void> task) {
-                    if (task.isSuccessful()) {
-                        Toast.makeText(Plant.this, "Stored...", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(Plant.this, "Error..!!!", Toast.LENGTH_SHORT).show();
-                    }
-                }
-            });
+                break;
         }
     }
 }

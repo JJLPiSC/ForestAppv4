@@ -40,10 +40,22 @@
                     android:textColor="#000000" />
 
                 <TextView
-                    android:id="@+id/tv_D"
+                    android:id="@+id/tv_nom"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/tv_T"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_toEndOf="@id/imageView"
+                    android:text="Nombre"
+                    android:textAppearance="@style/Base.TextAppearance.AppCompat.Small" />
+
+
+                <TextView
+                    android:id="@+id/tv_D"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tv_nom"
                     android:layout_marginStart="15dp"
                     android:layout_marginTop="5dp"
                     android:layout_toEndOf="@id/imageView"
@@ -89,20 +101,39 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/tv_V"
                     android:layout_marginStart="15dp"
-                    android:layout_marginTop="5dp"
                     android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium" />
+
+                <TextView
+                    android:id="@+id/tv_lat"
+                    android:text="PK"
+                    android:textColor="#FFF"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tv_V"
+                    android:layout_marginStart="15dp"
+                    android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium" />
+
+                <TextView
+                    android:id="@+id/tv_lng"
+                    android:text="PK"
+                    android:textColor="#FFF"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tv_V"
+                    android:layout_marginStart="15dp"
+                    android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium" />
+
 
                 <Button
                     android:id="@+id/btn_W"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="25dp"
-                    android:layout_marginTop="15dp"
+                    android:layout_marginStart="15dp"
                     android:layout_toEndOf="@id/tv_D"
                     android:background="@color/colorPrimary"
                     android:paddingLeft="15dp"
                     android:paddingRight="15dp"
-                    android:text="Water"
+                    android:text="@string/water"
                     android:textAppearance="@style/Base.TextAppearance.AppCompat.Small.Inverse"
                     android:textStyle="bold" />
 
@@ -111,13 +142,28 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/btn_W"
-                    android:layout_marginStart="25dp"
+                    android:layout_marginStart="15dp"
                     android:layout_marginTop="15dp"
                     android:layout_toEndOf="@id/tv_D"
                     android:background="@android:color/holo_orange_dark"
                     android:paddingLeft="5dp"
                     android:paddingRight="5dp"
-                    android:text="Exchange"
+                    android:text="Intercambiar"
+                    android:textAppearance="@style/Base.TextAppearance.AppCompat.Small.Inverse"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/btn_V"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/btn_E"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="15dp"
+                    android:layout_toEndOf="@id/tv_D"
+                    android:background="@android:color/holo_green_light"
+                    android:paddingLeft="5dp"
+                    android:paddingRight="5dp"
+                    android:text="Ver"
                     android:textAppearance="@style/Base.TextAppearance.AppCompat.Small.Inverse"
                     android:textStyle="bold" />
 

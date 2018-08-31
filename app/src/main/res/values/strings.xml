@@ -1,8 +1,11 @@
 <resources>
     <string name="app_name">ForestAppv4</string>
     <string name="title_activity_plant">Map</string>
-    <string name="resume">Resume</string>
+    <string name="resume">GPS</string>
     <string name="pause">Pause</string>
+    <string name="water">Regar</string>
+    <string name="wait">Espere</string>
     <string name="plant">Find</string>
     <string name="add">Plant</string>
+    <string name="title_activity_s__map">Map</string>
 </resources>

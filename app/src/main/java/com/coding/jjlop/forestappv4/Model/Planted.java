@@ -13,13 +13,28 @@ public class Planted {
     private String d_plant;
     @PropertyName("type")
     private String type;
+    @PropertyName("alias")
+    private String alias;
 
-    public Planted(String id_at, String lat, String lng, String d_plant, String type) {
+    public Planted(String id_at, String lat, String lng, String d_plant, String type, String alias) {
         this.id_at = id_at;
         this.lat = lat;
         this.lng = lng;
         this.d_plant = d_plant;
         this.type = type;
+        this.alias = alias;
+    }
+
+    public Planted(String id_at){
+        this.id_at = id_at;
+    }
+
+    public String getAlias() {
+        return alias;
+    }
+
+    public void setAlias(String alias) {
+        this.alias = alias;
     }
 
     public String getId_at() {

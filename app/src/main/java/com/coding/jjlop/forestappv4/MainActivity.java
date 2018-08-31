@@ -21,13 +21,12 @@ import com.coding.jjlop.forestappv4.Views.Profile;
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
     GridView gvm;
-    String[] values={"Owns","Plant","Exchange","Adopt","Profile"};
+    String[] values={"Mis Arboles","Plantar","Adoptar","Perfil"};
     int[] images={
             R.drawable.own,
             R.drawable.plant,
-            R.drawable.exchange,
             R.drawable.adopt,
-            R.drawable.plant
+            R.drawable.exchange
     };
     String uid;
 
@@ -48,15 +47,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     public void onBackPressed() {
         AlertDialog.Builder alertDialog1 = new AlertDialog.Builder(MainActivity.this);
-        alertDialog1.setTitle("Exit");
-        alertDialog1.setMessage("Really want to Exit???");
+        alertDialog1.setTitle("Salir");
+        alertDialog1.setMessage("Realmente quiere salir???");
         alertDialog1.setPositiveButton("OK", new DialogInterface.OnClickListener()
         {
             public void onClick(DialogInterface dialog, int which)
             {
                 finish();
             }
-        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener()
+        }).setNegativeButton("Cancelar", new DialogInterface.OnClickListener()
         {
             public void onClick(DialogInterface dialog, int which)
             {
@@ -75,24 +74,20 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         if (i==0){
-            Intent it = new Intent(MainActivity.this, Own.class);
+            Intent it = new Intent(MainActivity.this, Exchange.class);
             it.putExtra("Uid",uid);
             startActivity(it);
         }if (i==1){
             Intent it = new Intent(MainActivity.this,Plant.class);
             it.putExtra("Uid",uid);
             startActivity(it);
-        }if (i==2){
-            Intent it = new Intent(MainActivity.this,Exchange.class);
-            it.putExtra("Uid",uid);
-            startActivity(it);
         }
-        if (i==3){
+        if (i==2){
             Intent it = new Intent(MainActivity.this,Adopt.class);
             it.putExtra("Uid",uid);
             startActivity(it);
         }
-        if (i==4){
+        if (i==3){
             Intent it = new Intent(MainActivity.this,Profile.class);
             it.putExtra("Uid",uid);
             startActivity(it);
