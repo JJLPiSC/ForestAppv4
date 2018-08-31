@@ -72,7 +72,7 @@ public class single_Map extends FragmentActivity implements OnMapReadyCallback, 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_plant);
+        setContentView(R.layout.activity_single__map);
         mDatabase = FirebaseDatabase.getInstance().getReference();
         uid = getIntent().getStringExtra("Uid");
         lat = getIntent().getStringExtra("Lat");
@@ -81,8 +81,6 @@ public class single_Map extends FragmentActivity implements OnMapReadyCallback, 
         txt_alias = findViewById(R.id.txt_alias);
         btn1 = findViewById(R.id.btn_ver);
         btn1.setOnClickListener(this);
-        longitudeValueNetwork = findViewById(R.id.longitudeValueNetwork);
-        latitudeValueNetwork = findViewById(R.id.latitudeValueNetwork);
         int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getApplicationContext());
         if (status == ConnectionResult.SUCCESS) {
             SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()

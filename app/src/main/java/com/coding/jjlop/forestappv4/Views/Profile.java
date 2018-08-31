@@ -32,18 +32,22 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.shashank.sony.fancytoastlib.FancyToast;
+
+import java.util.Objects;
 
 public class Profile extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
 
     private ImageView photoImageView;
-    private TextView txt_nick, txt_email,txt_p, txt_d, txt_q;
+    private TextView txt_nick, txt_email, txt_p, txt_d, txt_q;
     private Button b1;
     private DatabaseReference mDatabase;
     private GoogleApiClient googleApiClient;
     private FirebaseAuth firebaseAuth;
     private FirebaseAuth.AuthStateListener firebaseAuthListener;
     private FirebaseUser user;
-    String uid, d, qu,p;
+    String uid, d, qu, p;
+    Integer tp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,11 +57,12 @@ public class Profile extends AppCompatActivity implements GoogleApiClient.OnConn
         photoImageView = findViewById(R.id.photoImageView);
         txt_nick = findViewById(R.id.txt_nick);
         txt_email = findViewById(R.id.txt_email);
-        txt_p= findViewById(R.id.txt_points);
+        txt_p = findViewById(R.id.txt_points);
         txt_d = findViewById(R.id.txt_d);
         txt_q = findViewById(R.id.txt_q);
         b1 = findViewById(R.id.btn1);
         b1.setOnClickListener(this);
+        tp = 0;
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
@@ -151,37 +156,34 @@ public class Profile extends AppCompatActivity implements GoogleApiClient.OnConn
 
     }
 
-    /*public void Save() {
-        Query query = mDatabase.child("Users").orderByChild("id_u").equalTo(uid);
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
+    public void fData(final FirebaseUser user1) {
+
+       /*Query qur = mDatabase.child("T_Ctlg").orderByChild("").equalTo(uid);
+        Log.d("", "UID: " + uid);
+        qur.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                dataSnapshot.getValue(String.class);
-                if (dataSnapshot.getChildrenCount()==0) {
-                    User u = new User(uid, user.getDisplayName(), user.getEmail(), txt_d.getText().toString(), txt_q.getText().toString(), "0","");
-                    mDatabase.child("Users").push().setValue(u).addOnCompleteListener(new OnCompleteListener<Void>() {
+                if (dataSnapshot.getChildrenCount() != 0) {
+                    dataSnapshot.getRef().addValueEventListener(new ValueEventListener() {
                         @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful()) {
-                                Toast.makeText(Profile.this, "Stored...", Toast.LENGTH_SHORT).show();
-                            } else {
-                                Toast.makeText(Profile.this, "Error..!!!" + task.getException(), Toast.LENGTH_SHORT).show();
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            for (DataSnapshot areaSnapshot : dataSnapshot.getChildren()) {
+                                Log.d("", "ALIASBD: " + areaSnapshot.child("alias").getValue(String.class));
+                                if (areaSnapshot.child("id_at").getValue(String.class).equals(uid)) {
+                                    tp +=Integer.parseInt(areaSnapshot.child("value").getValue(String.class)) ;
+                                }
                             }
                         }
-                    });
-                } else {
-                    User u = new User(uid, user.getDisplayName(), user.getEmail(), txt_d.getText().toString(), txt_q.getText().toString(), "0","");
-                    mDatabase.child("Users").child(uid).setValue(u).addOnCompleteListener(new OnCompleteListener<Void>() {
+
                         @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful()) {
-                                Toast.makeText(Profile.this, "Saving Changes...", Toast.LENGTH_SHORT).show();
-                            } else {
-                                Toast.makeText(Profile.this, "Error..!!!" + task.getException(), Toast.LENGTH_SHORT).show();
-                            }
+                        public void onCancelled(DatabaseError databaseError) {
+
                         }
                     });
 
+
+                } else {
+                    tp = 0;
                 }
             }
 
@@ -189,10 +191,8 @@ public class Profile extends AppCompatActivity implements GoogleApiClient.OnConn
             public void onCancelled(DatabaseError databaseError) {
 
             }
-        });
-    }*/
+        });*/
 
-    public void fData(final FirebaseUser user1) {
         final Query q = mDatabase.child("Users");
         //Query q = mDatabase.child("T_Ctlg");
         q.addValueEventListener(new ValueEventListener() {
@@ -204,9 +204,9 @@ public class Profile extends AppCompatActivity implements GoogleApiClient.OnConn
                         p = areaSnapshot.child("t_points").getValue(String.class);
                         d = areaSnapshot.child("degree").getValue(String.class);
                         qu = areaSnapshot.child("quarter").getValue(String.class);
-                        txt_p.setText("Puntos Totales: "+p);
-                        txt_d.setText("Carrera: "+d);
-                        txt_q.setText("Cuatrimestre: "+qu);
+                        txt_p.setText("Puntos Totales: " + tp);
+                        txt_d.setText("Carrera: " + d);
+                        txt_q.setText("Cuatrimestre: " + qu);
                     }
                 }
             }

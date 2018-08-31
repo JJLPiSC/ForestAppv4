@@ -21,12 +21,12 @@ import com.coding.jjlop.forestappv4.Views.Profile;
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
     GridView gvm;
-    String[] values={"Mis Arboles","Plantar","Adoptar","Perfil"};
+    String[] values={"Perfil","Plantar","Mis Arboles","Adoptar"};
     int[] images={
-            R.drawable.own,
+            R.drawable.exchange,
             R.drawable.plant,
-            R.drawable.adopt,
-            R.drawable.exchange
+            R.drawable.own,
+            R.drawable.adopt
     };
     String uid;
 
@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         if (i==0){
-            Intent it = new Intent(MainActivity.this, Exchange.class);
+            Intent it = new Intent(MainActivity.this, Profile.class);
             it.putExtra("Uid",uid);
             startActivity(it);
         }if (i==1){
@@ -83,12 +83,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             startActivity(it);
         }
         if (i==2){
-            Intent it = new Intent(MainActivity.this,Adopt.class);
+            Intent it = new Intent(MainActivity.this,Exchange.class);
             it.putExtra("Uid",uid);
             startActivity(it);
         }
         if (i==3){
-            Intent it = new Intent(MainActivity.this,Profile.class);
+            Intent it = new Intent(MainActivity.this,Adopt.class);
             it.putExtra("Uid",uid);
             startActivity(it);
         }

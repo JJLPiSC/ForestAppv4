@@ -15,6 +15,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -46,19 +47,23 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.shashank.sony.fancytoastlib.FancyToast;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
+
+import static java.lang.Integer.parseInt;
 
 public class Plant extends FragmentActivity implements OnMapReadyCallback, View.OnClickListener {
 
     LocationManager locationManager;
     double longitudeNetwork, latitudeNetwork;
-    TextView longitudeValueNetwork, latitudeValueNetwork;
-    Button btn1, btn2;
+    //TextView longitudeValueNetwork, latitudeValueNetwork;
+    Button btn1, btn2, btn3;
     GoogleMap mMap;
     EditText txt_alias;
     Marker marker;
@@ -67,7 +72,7 @@ public class Plant extends FragmentActivity implements OnMapReadyCallback, View.
     final List<String> trees = new ArrayList<>();
     final List<String> itrees = new ArrayList<>();
     String l, t, k;
-    String uid;
+    String uid, nv, tp;
     Tree tree;
 
     @Override
@@ -80,11 +85,12 @@ public class Plant extends FragmentActivity implements OnMapReadyCallback, View.
         txt_alias = findViewById(R.id.txt_alias);
         btn1 = findViewById(R.id.btn_Add);
         btn2 = findViewById(R.id.btn_Save);
+        btn3 = findViewById(R.id.btn_resume);
         btn1.setOnClickListener(this);
         btn2.setOnClickListener(this);
         tSpinner = findViewById(R.id.snp_tr);
-        longitudeValueNetwork = findViewById(R.id.longitudeValueNetwork);
-        latitudeValueNetwork = findViewById(R.id.latitudeValueNetwork);
+        //longitudeValueNetwork = findViewById(R.id.longitudeValueNetwork);
+        //latitudeValueNetwork = findViewById(R.id.latitudeValueNetwork);
         int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getApplicationContext());
         if (status == ConnectionResult.SUCCESS) {
             SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -141,7 +147,6 @@ public class Plant extends FragmentActivity implements OnMapReadyCallback, View.
         } else {
             locationManager.requestLocationUpdates(
                     LocationManager.NETWORK_PROVIDER, 20 * 1000, 10, locationListenerNetwork);
-            Toast.makeText(this, "Network provider started running", Toast.LENGTH_LONG).show();
             button.setText(R.string.pause);
         }
     }
@@ -151,30 +156,42 @@ public class Plant extends FragmentActivity implements OnMapReadyCallback, View.
             longitudeNetwork = location.getLongitude();
             latitudeNetwork = location.getLatitude();
 
-            runOnUiThread(new Runnable() {
+            /*runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     longitudeValueNetwork.setText(longitudeNetwork + "");
                     latitudeValueNetwork.setText(latitudeNetwork + "");
                 }
-            });
+            });*/
+            if (latitudeNetwork != 0.0 && longitudeNetwork != 0.0) {
+                locationManager.removeUpdates(locationListenerNetwork);
+                btn3.setText(R.string.resume);
+                FancyToast.makeText(getApplicationContext(), "Ubicado", Toast.LENGTH_SHORT, FancyToast.CONFUSING, true).show();
+            }
         }
 
         @Override
-        public void onStatusChanged(String s, int i, Bundle bundle) {}
+        public void onStatusChanged(String s, int i, Bundle bundle) {
+        }
 
         @Override
-        public void onProviderEnabled(String s) {}
+        public void onProviderEnabled(String s) {
+        }
 
         @Override
-        public void onProviderDisabled(String s) {}
+        public void onProviderDisabled(String s) {
+        }
     };
 
     public void AddMarker() {
-        LatLng t1 = new LatLng(Double.parseDouble((String) latitudeValueNetwork.getText()), Double.parseDouble((String) longitudeValueNetwork.getText()));
-        mMap.addMarker(new MarkerOptions().position(t1).title("My New Tree!!!").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
-        float zoom = 16;
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(t1, zoom));
+        if (latitudeNetwork != 0.0 && longitudeNetwork != 0.0) {
+            LatLng t1 = new LatLng(latitudeNetwork, longitudeNetwork);
+            mMap.addMarker(new MarkerOptions().position(t1).title("Mi Nuevo Arbol!!!").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+            float zoom = 16;
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(t1, zoom));
+        } else {
+            FancyToast.makeText(getApplicationContext(), "Obtenga su ubicación", Toast.LENGTH_SHORT, FancyToast.WARNING, true).show();
+        }
     }
 
     public void AddmMarker(String lat, String lng, String t) {
@@ -183,24 +200,107 @@ public class Plant extends FragmentActivity implements OnMapReadyCallback, View.
     }
 
     public void Save() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
-        Date date = new Date();
-        String fecha = dateFormat.format(date);
-        String Lat = latitudeValueNetwork.getText().toString().trim();
-        String Lng = longitudeValueNetwork.getText().toString().trim();
+        if (!txt_alias.getText().toString().equals("")) {
+            if (latitudeNetwork != 0.0 && longitudeNetwork != 0.0) {
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+                Date date = new Date();
+                String fecha = dateFormat.format(date);
+                //String Lat = latitudeValueNetwork.getText().toString().trim();
+                //String Lng = longitudeValueNetwork.getText().toString().trim();
+                String Lat = String.valueOf(latitudeNetwork);
+                String Lng = String.valueOf(longitudeNetwork);
 
-        Planted p = new Planted(uid, Lat, Lng, fecha, tSpinner.getSelectedItem().toString().trim(), txt_alias.getText().toString().trim());
-        mDatabase.child("Planted").push().setValue(p).addOnCompleteListener(new OnCompleteListener<Void>() {
+                Planted p = new Planted(uid, Lat, Lng, fecha, tSpinner.getSelectedItem().toString().trim(), txt_alias.getText().toString().trim());
+                mDatabase.child("Planted").push().setValue(p).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            FancyToast.makeText(getApplicationContext(), "Almacenado", Toast.LENGTH_SHORT, FancyToast.SUCCESS, true).show();
+
+                        } else {
+                            FancyToast.makeText(getApplicationContext(), "Intenta Otra Vez!!!", Toast.LENGTH_SHORT, FancyToast.DEFAULT, true).show();
+
+                        }
+                    }
+                });
+            } else {
+                FancyToast.makeText(getApplicationContext(), "Obtenga su Ubicación", Toast.LENGTH_SHORT, FancyToast.WARNING, true).show();
+            }
+
+        } else {
+            FancyToast.makeText(getApplicationContext(), "Introdusca un Alias", Toast.LENGTH_SHORT, FancyToast.WARNING, true).show();
+
+        }
+        /*Query q = mDatabase.child("T_Ctlg").orderByChild("name").equalTo(tSpinner.getSelectedItem().toString());
+
+        q.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if (task.isSuccessful()) {
-                    Toast.makeText(Plant.this, "Almacenado...", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(Plant.this, "Intenta Otra Vez!!!", Toast.LENGTH_SHORT).show();
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.getChildrenCount() != 0) {
+                    dataSnapshot.getRef().addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            for (DataSnapshot areaSnapshot : dataSnapshot.getChildren()) {
+                                if (areaSnapshot.child("name").getValue(String.class).equals(tSpinner.getSelectedItem().toString())) {
+                                    Log.d("",""+areaSnapshot.child("value").getValue(String.class));
+                                    nv = areaSnapshot.child("value").getValue(String.class);
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                        }
+                    });
                 }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
             }
         });
 
+        Query qu = mDatabase.child("Users").orderByChild("id_u").equalTo(uid);
+
+        qu.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.getChildrenCount() != 0) {
+                    dataSnapshot.getRef().addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            for (DataSnapshot areaSnapshot : dataSnapshot.getChildren()) {
+                                if (areaSnapshot.child("id_u").getValue(String.class).equals(uid)) {
+                                    Log.d("",""+areaSnapshot.child("t_points").getValue(String.class));
+                                    tp = areaSnapshot.child("t_points").getValue(String.class);
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                        }
+                    });
+                    Integer total = Integer.parseInt(tp) + Integer.parseInt(nv);
+                    mDatabase.child("Users").child("t_points").setValue(total.toString()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                Toast.makeText(Plant.this, "Sumado...", Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(Plant.this, "Fallo!!!", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });*/
     }
 
     public void fillSnp() {
