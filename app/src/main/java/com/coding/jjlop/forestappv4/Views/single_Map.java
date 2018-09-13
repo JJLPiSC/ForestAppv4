@@ -185,7 +185,7 @@ public class single_Map extends FragmentActivity implements OnMapReadyCallback, 
         String Lat = latitudeValueNetwork.getText().toString().trim();
         String Lng = longitudeValueNetwork.getText().toString().trim();
 
-        Planted p = new Planted(uid, Lat, Lng, fecha, tSpinner.getSelectedItem().toString().trim(), txt_alias.getText().toString().trim());
+        Planted p = new Planted(uid, Lat, Lng, fecha,fecha, tSpinner.getSelectedItem().toString().trim(), txt_alias.getText().toString().trim());
         mDatabase.child("Planted").push().setValue(p).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {

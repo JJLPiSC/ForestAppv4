@@ -11,22 +11,33 @@ public class Planted {
     private String lng;
     @PropertyName("d_plant")
     private String d_plant;
+    @PropertyName("l_water")
+    private String l_water;
     @PropertyName("type")
     private String type;
     @PropertyName("alias")
     private String alias;
 
-    public Planted(String id_at, String lat, String lng, String d_plant, String type, String alias) {
+    public Planted(String id_at, String lat, String lng, String d_plant, String l_water, String type, String alias) {
         this.id_at = id_at;
         this.lat = lat;
         this.lng = lng;
         this.d_plant = d_plant;
+        this.l_water = l_water;
         this.type = type;
         this.alias = alias;
     }
 
-    public Planted(String id_at){
+    public Planted(String id_at) {
         this.id_at = id_at;
+    }
+
+    public String getL_water() {
+        return l_water;
+    }
+
+    public void setL_water(String l_water) {
+        this.l_water = l_water;
     }
 
     public String getAlias() {

@@ -16,7 +16,7 @@ public class GridAdapter extends BaseAdapter {
     private final int[] images;
     View view;
     LayoutInflater li;
-
+    //Obtenemos el contexto , titulos e imagenes que conforman el menu principal
     public GridAdapter(Context con, String[] values, int[] images) {
         this.con = con;
         this.values = values;
@@ -39,7 +39,7 @@ public class GridAdapter extends BaseAdapter {
     public long getItemId(int i) {
         return 0;
     }
-
+    //Inflamos el layout correspondiente y referenciamos sus componentes
     @Override
     public View getView(int i, View convertView, ViewGroup viewGroup) {
         li= (LayoutInflater) con.getSystemService(Context.LAYOUT_INFLATER_SERVICE);

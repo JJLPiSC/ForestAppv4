@@ -1,12 +1,9 @@
 package com.coding.jjlop.forestappv4.Views;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.view.View;
-import android.widget.Toast;
 
 import com.coding.jjlop.forestappv4.Adapter.ExchAdapter;
 import com.coding.jjlop.forestappv4.Model.Tree;
@@ -17,8 +14,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
-import com.shashank.sony.fancytoastlib.FancyToast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +24,7 @@ public class Exchange extends AppCompatActivity {
     private RecyclerView recyclerView;
     private DatabaseReference mDataBase;
     private String uid;
-    private String d_p, type,id_t, alias;
+    private String d_p, l, type, id_t, alias;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +41,7 @@ public class Exchange extends AppCompatActivity {
         tList = new ArrayList<>();
 
         //creating recyclerview adapter
-        final ExchAdapter adapter = new ExchAdapter(this, fillList(),uid);
+        final ExchAdapter adapter = new ExchAdapter(this, fillList(), uid);
 
         //setting adapter to recyclerview
         recyclerView.setAdapter(adapter);
@@ -63,12 +58,13 @@ public class Exchange extends AppCompatActivity {
                 String id = dataSnapshot.child("id_at").getValue(String.class);
                 if (uid.equals(id)) {
                     d_p = dataSnapshot.child("d_plant").getValue(String.class);
+                    l = dataSnapshot.child("l_water").getValue(String.class);
                     type = dataSnapshot.child("type").getValue(String.class);
                     alias = dataSnapshot.child("alias").getValue(String.class);
                     id_t = dataSnapshot.getKey();
                     String lt = dataSnapshot.child("lat").getValue(String.class);
                     String ln = dataSnapshot.child("lng").getValue(String.class);
-                    tList= c_list(d_p, type,id_t,alias,lt,ln);
+                    tList = c_list(d_p, l, type, id_t, alias, lt, ln);
                 }
             }
 
@@ -97,22 +93,20 @@ public class Exchange extends AppCompatActivity {
         return tList;
     }
 
-    public List<Tree> c_list(final String d, final String t, final String it, final String alia,final String lt, final String ln ) {
+    public List<Tree> c_list(final String d, final String l, final String t, final String it, final String alia, final String lt, final String ln) {
         Query quer = mDataBase.child("T_Ctlg");
 
         quer.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 String n = dataSnapshot.child("name").getValue(String.class);
-                //Log.d("","Type: "+t);
-                //Log.d("","TypeN: "+n);
                 if (t.equals(n)) {
                     String na = dataSnapshot.child("name").getValue(String.class);
                     String o = dataSnapshot.child("order").getValue(String.class);
                     String e = dataSnapshot.child("species").getValue(String.class);
                     String v = dataSnapshot.child("value").getValue(String.class);
                     String i = dataSnapshot.child("i_perd").getValue(String.class);
-                    Tree tree = new Tree(it, t, o, e, v, i,d,alia,lt,ln);
+                    Tree tree = new Tree(it, t, o, e, v, i, d, l, alia, lt, ln);
                     tList.add(tree);
                 }
             }

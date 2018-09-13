@@ -18,6 +18,8 @@ public class Tree {
     private String i_perd;
     @PropertyName("d_plant")
     private String dp;
+    @PropertyName("l_water")
+    private String l_water;
     @PropertyName("alias")
     private String alias;
     @PropertyName("lat")
@@ -34,12 +36,11 @@ public class Tree {
         this.name = name;
         this.order = order;
         this.species = species;
-
         this.value = value;
         this.i_perd = i_perd;
     }
 
-    public Tree(String id_t, String name, String order, String species, String value, String i_perd, String dp, String alias, String lat, String Lng) {
+    public Tree(String id_t, String name, String order, String species, String value, String i_perd, String dp,String l_water, String alias, String lat, String Lng) {
         this.id_t = id_t;
         this.name = name;
         this.order = order;
@@ -47,7 +48,16 @@ public class Tree {
         this.value = value;
         this.i_perd = i_perd;
         this.dp = dp;
+        this.l_water = l_water;
         this.alias = alias;
+    }
+
+    public String getL_water() {
+        return l_water;
+    }
+
+    public void setL_water(String l_water) {
+        this.l_water = l_water;
     }
 
     public String getAlias() {

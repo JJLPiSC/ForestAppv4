@@ -37,6 +37,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.shashank.sony.fancytoastlib.FancyToast;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -45,15 +46,16 @@ import java.util.Locale;
 import java.util.Objects;
 
 public class ExchAdapter extends RecyclerView.Adapter<ExchAdapter.TreeViewHolder> {
-    //this context we will use to inflate the layout
+    //Este contexto sera usado para mostrar (inflate) el layout
     private Context mCtx;
-    private String pk_t, ty, dp, ip;
+    private String pk_t, ty, lw, ip;
     private final String uid;
-    //we are storing all the products in a list
+    //Se guardaran los arboles en una lista
     private List<Tree> treeList;
+    //Elemento encargado de manejar localizacion
     LocationManager locationManager;
 
-    //getting the context and product list with constructor
+    //Obtener contexto y lista de productos desde el constructor
     public ExchAdapter(Context mCtx, List<Tree> productList, String uid) {
         this.mCtx = mCtx;
         this.treeList = productList;
@@ -62,21 +64,22 @@ public class ExchAdapter extends RecyclerView.Adapter<ExchAdapter.TreeViewHolder
 
     @Override
     public TreeViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        //inflating and returning our view holder
+        //Inflar y retornar nuestro view holder
         LayoutInflater inflater = LayoutInflater.from(mCtx);
         View view = inflater.inflate(R.layout.exc_layout, null);
-        return new TreeViewHolder(view, uid);
+        return new TreeViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(TreeViewHolder holder, int position) {
-        //getting the product of the specified position
+        //Obtener el arbol de la posicion especificada
         Tree product = treeList.get(position);
 
-        //binding the data with the viewholder views
+        //Relacionando los datos con las vistas del viewholder
         holder.textViewTitle.setText(product.getAlias());
         holder.textViewName.setText(product.getName());
         holder.textViewDate.setText(product.getDp());
+        holder.textViewLW.setText(product.getL_water());
         holder.textViewOrder.setText(String.valueOf(product.getOrder()));
         holder.textViewSpecie.setText(String.valueOf(product.getSpecies()));
         holder.textViewValue.setText("Valor: " + String.valueOf(product.getValue()));
@@ -88,8 +91,47 @@ public class ExchAdapter extends RecyclerView.Adapter<ExchAdapter.TreeViewHolder
         locationManager = (LocationManager) mCtx.getSystemService(Context.LOCATION_SERVICE);
         pk_t = String.valueOf(product.getId_t());
         ty = String.valueOf(product.getName());
-        dp = String.valueOf(product.getDp());
+        lw = String.valueOf(product.getL_water());
         ip = String.valueOf(product.getI_perd());
+        try {
+            sFecha(holder);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @SuppressLint("ResourceAsColor")
+    public void sFecha(TreeViewHolder holder) throws ParseException {
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+        Date date = new Date();
+        Date l_water = dateFormat.parse(lw);
+        String d1 = dateFormat.format(date.getTime());
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(l_water); // Configuramos la fecha que se recibe (Actual)
+        //Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DAY_OF_YEAR, Integer.parseInt(ip));  // numero de dias a añadir, o restar
+        String f2 = dateFormat.format(calendar.getTime());
+        //Integer dias = (int) ((calendar.getTime() -calendar2.getTime() ) / 86400000);
+
+        Date c_date = dateFormat.parse(d1);
+        Date l_date = dateFormat.parse(f2);
+        Log.d("","FI"+l_water);
+        Log.d("","FF"+l_date);
+        Log.d("","FA"+c_date);
+
+
+        int dias = (int) ((l_date.getTime() - c_date.getTime()) / 86400000);
+        if (dias > 0) {
+            holder.textViewIP.setText("Dias para Riego: " + String.valueOf(dias));
+            holder.textViewIP.setTextColor(holder.textViewIP.getContext().getResources().getColor(R.color.colorP));
+        } if (dias == 0) {
+            holder.textViewIP.setText("Ultimo Día !!!");
+            holder.textViewIP.setTextColor(holder.textViewIP.getContext().getResources().getColor(R.color.colorW));
+        }if (dias < 0) {
+            holder.textViewIP.setText("Dias de Retraso: " + String.valueOf(dias*-1));
+            holder.textViewIP.setTextColor(holder.textViewIP.getContext().getResources().getColor(R.color.colorN));
+        }
     }
 
     @Override
@@ -100,22 +142,24 @@ public class ExchAdapter extends RecyclerView.Adapter<ExchAdapter.TreeViewHolder
 
     class TreeViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        TextView textViewTitle, textViewName, textViewDate, textViewOrder, textViewIP, textViewSpecie, textViewValue, textViewPK, textViewLat, textViewLng;
+        TextView textViewTitle, textViewName, textViewDate, textViewLW, textViewOrder, textViewIP, textViewSpecie, textViewValue, textViewPK, textViewLat, textViewLng;
         Button btn_wt, btn_exch, btn_view;
         ImageView imageView;
         String nu_Id;
         LocationManager locationManager;
         double longitudeNetwork, latitudeNetwork;
-        boolean pass_conf = false;
+        //Referencia de la base de datos
         DatabaseReference mData = FirebaseDatabase.getInstance().getReference();
         View nview;
 
-        private TreeViewHolder(View itemView, String uid) {
+        private TreeViewHolder(View itemView) {
             super(itemView);
 
+            //Relacionando las variables con los componentes de la vista
             textViewTitle = itemView.findViewById(R.id.tv_T);
             textViewName = itemView.findViewById(R.id.tv_nom);
             textViewDate = itemView.findViewById(R.id.tv_D);
+            textViewLW = itemView.findViewById(R.id.tv_LW);
             textViewOrder = itemView.findViewById(R.id.tv_O);
             textViewSpecie = itemView.findViewById(R.id.tv_S);
             textViewValue = itemView.findViewById(R.id.tv_V);
@@ -131,6 +175,7 @@ public class ExchAdapter extends RecyclerView.Adapter<ExchAdapter.TreeViewHolder
             btn_view.setOnClickListener(this);
             imageView = itemView.findViewById(R.id.imageView);
             nview = itemView;
+            //Inicializa el location Manager
             locationManager = (LocationManager) mCtx.getSystemService(Context.LOCATION_SERVICE);
         }
 
@@ -145,7 +190,6 @@ public class ExchAdapter extends RecyclerView.Adapter<ExchAdapter.TreeViewHolder
                     View mNView = view.getRootView().inflate(view.getContext(), R.layout.n_exch, null);
                     final EditText mUser = mNView.findViewById(R.id.et1);
                     final EditText mPassword = mNView.findViewById(R.id.et22);
-                    //final EditText mPK = mNView.findViewById(R.id.tv_PK);
                     Button mLogin = mNView.findViewById(R.id.btn_na);
                     mBuilder.setView(mNView);
                     final AlertDialog dialog = mBuilder.create();
@@ -154,9 +198,9 @@ public class ExchAdapter extends RecyclerView.Adapter<ExchAdapter.TreeViewHolder
                         @Override
                         public void onClick(View view) {
                             if (!mUser.getText().toString().isEmpty() && !mPassword.getText().toString().isEmpty()) {
-                                Log.d("", "" + mUser.getText().toString());
-                                Log.d("", "" + mPassword.getText().toString());
-                                Log.d("", "" + pk_t);
+                                //Log.d("", "" + mUser.getText().toString());
+                                //Log.d("", "" + mPassword.getText().toString());
+                                //Log.d("", "" + pk_t);
                                 Exc(mUser.getText().toString().trim(), mPassword.getText().toString().trim(), pk_t, ty);
                                 dialog.dismiss();
                             } else {
@@ -183,16 +227,18 @@ public class ExchAdapter extends RecyclerView.Adapter<ExchAdapter.TreeViewHolder
             }
         }
 
+        //Metodo encargado de verificar que los servicios de localizacion esten activos
         private boolean checkLocation() {
             if (!isLocationEnabled())
                 showAlert();
             return isLocationEnabled();
         }
 
+        //Metodo encargado de mostrar un alerta para activar la ubicacion
         private void showAlert() {
             final AlertDialog.Builder dialog = new AlertDialog.Builder(mCtx);
             dialog.setTitle("Enable Location")
-                    .setMessage("Su ubicación esta desactivada.\npor favor active su ubicación " +
+                    .setMessage("Su ubicación esta desactivada.\nPor favor active su ubicación " +
                             "usa esta app")
                     .setPositiveButton("Configuración de ubicación", new DialogInterface.OnClickListener() {
                         @Override
@@ -209,11 +255,13 @@ public class ExchAdapter extends RecyclerView.Adapter<ExchAdapter.TreeViewHolder
             dialog.show();
         }
 
+        //Verifica si los servicios del provedor GPS o de Red estan disponibles
         private boolean isLocationEnabled() {
             return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
                     locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
         }
 
+        //Listener encardado de registrar los cambios de ubicacion
         private final LocationListener locationListenerNetwork = new LocationListener() {
             public void onLocationChanged(android.location.Location location) {
                 longitudeNetwork = location.getLongitude();
@@ -238,6 +286,7 @@ public class ExchAdapter extends RecyclerView.Adapter<ExchAdapter.TreeViewHolder
             }
         };
 
+        //Metodo encargado de activar y desactivar las peticiones de ubicacion
         public void NetworkUpdates(View view) {
             if (!checkLocation())
                 return;
@@ -254,25 +303,8 @@ public class ExchAdapter extends RecyclerView.Adapter<ExchAdapter.TreeViewHolder
             }
         }
 
-        @SuppressLint("ResourceAsColor")
-        public void sFecha() {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
-            Date date = new Date();
-            String f1 = dateFormat.format(date.getTime());
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(date); // Configuramos la fecha que se recibe (Actual)
-            calendar.add(Calendar.DAY_OF_MONTH, Integer.parseInt(ip));  // numero de horas a añadir, o restar en caso de horas<0
-            String f2 = dateFormat.format(calendar.getTime());
-            Integer dias = (int) ((Integer.parseInt(f1) - Integer.parseInt(f2)) / 86400000);
-            if (dias >= 0) {
-                textViewIP.setText("Dias para Riego: " + String.valueOf(dias));
-                textViewIP.setTextColor(R.color.colorP);
-            } else {
-                textViewIP.setText("Dias para Riego: " + String.valueOf(dias));
-                textViewIP.setTextColor(R.color.colorN);
-            }
-        }
-
+        /*Metodo encargado de verificar las coordenadas del arbol que se intenta
+         *regar con las coordenadas de la posicion actual del usuario*/
         public void getCoord(final Double lat, final Double lng, final String key, final String alias) {
             Log.d("", "Latitud Actual: " + lat.toString());
             Log.d("", "Lon Actual: " + lng.toString());
@@ -297,8 +329,7 @@ public class ExchAdapter extends RecyclerView.Adapter<ExchAdapter.TreeViewHolder
                                             Log.d("", "ST " + areaSnapshot.child("type").getValue(String.class));
                                             Log.d("", "SLAT " + areaSnapshot.child("lat").getValue(String.class));
                                             Log.d("", "SLONG " + areaSnapshot.child("lng").getValue(String.class));
-                                            // sFecha();
-                                            FancyToast.makeText(mCtx, "Regado", Toast.LENGTH_SHORT, FancyToast.INFO, true).show();
+                                            Wat(key);
                                         } else {
                                             Log.d("", "NO " + areaSnapshot.child("type").getValue(String.class));
                                             Log.d("", "NO " + areaSnapshot.child("lat").getValue(String.class));
@@ -331,6 +362,7 @@ public class ExchAdapter extends RecyclerView.Adapter<ExchAdapter.TreeViewHolder
             btn_wt.setText(R.string.water);
         }
 
+        //Metodo encargado de validar contraseña de instercambio
         public void Exc(final String nu, final String p, final String k, final String ty) {
 
             Query q = mData.child("Users").orderByChild("id_u").equalTo(uid);
@@ -370,6 +402,7 @@ public class ExchAdapter extends RecyclerView.Adapter<ExchAdapter.TreeViewHolder
             });
         }
 
+        //Metodo encargado de validar nuevo deuño y realizar el intercambio
         public void val_Exc(final String nu, final String k, final String ty) {
             Query qu = mData.child("Users").orderByChild("nick").equalTo(nu);
             qu.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -417,6 +450,22 @@ public class ExchAdapter extends RecyclerView.Adapter<ExchAdapter.TreeViewHolder
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
 
+                }
+            });
+        }
+
+        public void Wat(String k){
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+            Date date = new Date();
+            String d1 = dateFormat.format(date.getTime());
+            mData.child("Planted").child(k).child("l_water").setValue(d1).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (task.isSuccessful()) {
+                        FancyToast.makeText(mCtx, "Regado", Toast.LENGTH_SHORT, FancyToast.INFO, true).show();
+                    } else {
+                        FancyToast.makeText(mCtx, "Error!!!", Toast.LENGTH_SHORT, FancyToast.ERROR, true).show();
+                    }
                 }
             });
         }

@@ -210,7 +210,7 @@ public class Plant extends FragmentActivity implements OnMapReadyCallback, View.
                 String Lat = String.valueOf(latitudeNetwork);
                 String Lng = String.valueOf(longitudeNetwork);
 
-                Planted p = new Planted(uid, Lat, Lng, fecha, tSpinner.getSelectedItem().toString().trim(), txt_alias.getText().toString().trim());
+                Planted p = new Planted(uid, Lat, Lng, fecha, fecha, tSpinner.getSelectedItem().toString().trim(), txt_alias.getText().toString().trim());
                 mDatabase.child("Planted").push().setValue(p).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
